@@ -1,0 +1,37 @@
+#+title: ox-html-stable-ids
+
+#+headers: :exports none
+#+begin_src org :tangle example.org
+  ,* Hello, world!
+#+end_src
+
+#+headers: :exports none
+#+begin_src emacs-lisp
+  (org-publish-file "example.org"
+		    '("ox-html-stable-ids"
+	              :publishing-function org-html-publish-to-html
+		      :base-directory "."
+		      :publishing-directory "."
+		      :section-numbers nil
+		      :with-toc nil))
+#+end_src
+
+#+RESULTS:
+
+When publishing HTML with Org mode's exporters, the headlines in the resulting documents get assigned ID attributes.
+These are used as anchors, amongst other things.
+By default, these are random, so a headline might get assigned ~org81963c6~ as its ID:
+
+#+headers: :cache yes
+#+headers: :exports results
+#+headers: :results scalar
+#+begin_src shell
+  cat example.html | grep "<h2 id="
+#+end_src
+
+#+RESULTS[bceb2028e92191632ebd6a8816fa0dfa61629e2e]:
+: <h2 id="org81963c6">Hello, world!</h2>
+
+Because subsequent exports of the same Org file produce different IDs, there's no way to bookmark a headline.
+Instead, it'd be useful to have stable IDs, based on the titles they're attached to.
+In the example above, that ID would be "hello-world".
