@@ -35,3 +35,16 @@ By default, these are random, so a headline might get assigned ~org81963c6~ as i
 Because subsequent exports of the same Org file produce different IDs, there's no way to bookmark a headline.
 Instead, it'd be useful to have stable IDs, based on the titles they're attached to.
 In the example above, that ID would be "hello-world".
+
+#+headers: :exports none
+#+headers: :tangle test.el
+#+begin_src emacs-lisp
+  (require 'ert)
+
+  (ert-deftest hello-world-test ()
+    (find-file "example.org")
+    (org-html-export-as-html)
+    (should (string-match-p
+	     "<h2 id=\"hello-world"
+	     (with-current-buffer "*Org HTML Export*" (buffer-string)))))
+#+end_src
