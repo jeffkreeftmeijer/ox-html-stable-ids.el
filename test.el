@@ -9,3 +9,12 @@
 	   "<h2 id=\"hello-world"
 	   (with-current-buffer "*Org HTML Export*" (buffer-string))))
   (org-html-stable-ids-remove))
+
+(ert-deftest multiple-headlines-test ()
+  (org-html-stable-ids-add)
+  (find-file "example-3.org")
+  (org-html-export-as-html)
+  (let ((buffer (with-current-buffer "*Org HTML Export*" (buffer-string))))
+    (should (string-match-p "<h2 id=\"hello-world" buffer))
+    (should (string-match-p "<h2 id=\"another-headline" buffer)))
+  (org-html-stable-ids-remove))

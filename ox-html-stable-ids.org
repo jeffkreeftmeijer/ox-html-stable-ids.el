@@ -74,7 +74,6 @@ To make the custom function easy to switch on and off, we'll write two helper fu
 
 To check if everything is hooked up correctly, we'll define =org-html-stable-ids--get-reference= that ignores the inputs and returns a static result:
 
-#+headers: :tangle ox-html-stable-ids.el
 #+begin_src emacs-lisp
   (defun org-html-stable-ids--get-reference (datum info)
     "hello-world")
@@ -113,3 +112,71 @@ As expected, the result used "hello-world" as the ID for all headlines:
 #+RESULTS[564a1f36688d42106a6f84efdae6067cf4bcbfd3]:
 : <h2 id="hello-world">Hello, world!</h2>
 : <h2 id="hello-world">Another headline!</h2>
+
+To have the IDs match each separate headline's contents, take the headline from the =datum= parmeter with =org-element-property=:
+
+#+headers: :exports none
+#+headers: :tangle test.el
+#+begin_src emacs-lisp
+  (ert-deftest multiple-headlines-test ()
+    (org-html-stable-ids-add)
+    (find-file "example-3.org")
+    (org-html-export-as-html)
+    (let ((buffer (with-current-buffer "*Org HTML Export*" (buffer-string))))
+      (should (string-match-p "<h2 id=\"hello-world" buffer))
+      (should (string-match-p "<h2 id=\"another-headline" buffer)))
+    (org-html-stable-ids-remove))
+#+end_src
+
+#+RESULTS:
+: multiple-headlines-test
+
+#+headers: :tangle oxhtml-stable-ids.el
+#+begin_src emacs-lisp
+  (defun org-html-stable-ids--get-reference (datum info)
+    (org-html-stable-ids--to-kebab-case
+     (org-element-property :raw-value datum)))
+
+  (defun org-html-stable-ids--to-kebab-case (string)
+    (string-trim
+     (replace-regexp-in-string "[^a-z0-9]+" "-"
+                               (downcase string))
+     "-" "-"))
+#+end_src
+
+#+RESULTS:
+: org-html-stable-ids--to-kebab-case
+
+Now, all headlines in the file get assigned IDs that match their contents:
+
+#+headers: :exports none
+#+begin_src org :tangle example-3.org
+  ,* Hello, world!
+  ,* Another headline!
+#+end_src
+
+#+headers: :exports none
+#+begin_src emacs-lisp
+  (org-html-stable-ids-add)
+  (org-publish-file "example-3.org"
+		    '("ox-html-stable-ids"
+	              :publishing-function org-html-publish-to-html
+		      :base-directory "."
+		      :publishing-directory "."
+		      :section-numbers nil
+		      :with-toc nil))
+  (org-html-stable-ids-remove)
+#+end_src
+
+#+RESULTS:
+
+#+headers: :cache yes
+#+headers: :exports results
+#+headers: :results scalar
+#+begin_src shell
+  cat example-3.html | grep "<h2 id="
+#+end_src
+
+#+RESULTS[7ca8f72e3c8cf16f3aeb35f5f6e42e8d2c705f5f]:
+: <h2 id="hello-world">Hello, world!</h2>
+: <h2 id="another-headline">Another headline!</h2>
