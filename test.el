@@ -24,3 +24,9 @@
   (find-file "example-5.org")
   (should-error (org-html-export-as-html))
   (org-html-stable-ids-remove))
+
+(ert-deftest duplicate-headlines-with-custom-id-test ()
+  (org-html-stable-ids-add)
+  (find-file "example-6.org")
+  (should-error (org-html-export-as-html))
+  (org-html-stable-ids-remove))

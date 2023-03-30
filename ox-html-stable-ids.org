@@ -290,19 +290,53 @@ Now, the function raises an error when two headlines resolve to the same ID:
 Duplicate ID: hello-world
 #+end_example
 
-#+headers: :tangle ox-html-stable-ids.el
+In another scenario, one headline has a custom ID that matches a previously resolved ID.
+Because this yields duplicate IDs, this should also raise an error.
+Currently, it doesn't:
+
+#+begin_src org :tangle example-6.org
+  ,* Hello, world!
+  ,* Another headline!
+  :PROPERTIES:
+  :CUSTOM_ID: hello-world
+  :END:
+#+end_src
+
+#+headers: :exports none
+#+headers: :tangle test.el
 #+begin_src emacs-lisp
-  (defun org-html-stable-ids--get-reference (datum info)
-    (let ((cache (plist-get info :internal-references)))
-      (let ((id (org-html-stable-ids--to-kebab-case
-		 (org-element-property :raw-value datum))))
-	(or (rassq datum cache)
-	    (if (assoc id cache)
-		(user-error "Duplicate ID: %s" id)
-	      (push (cons id datum) cache)
-	      (plist-put info :internal-references cache)
-	      id)))))
+  (ert-deftest duplicate-headlines-with-custom-id-test ()
+    (org-html-stable-ids-add)
+    (find-file "example-6.org")
+    (should-error (org-html-export-as-html))
+    (org-html-stable-ids-remove))
 #+end_src
 
 #+RESULTS:
-: org-html-stable-ids--get-reference
+: duplicate-headlines-with-custom-id-test
+
+#+headers: :exports none
+#+begin_src emacs-lisp
+  (org-html-stable-ids-add)
+  (org-publish-file "example-6.org"
+		    '("ox-html-stable-ids"
+	              :publishing-function org-html-publish-to-html
+		      :base-directory "."
+		      :publishing-directory "."
+		      :section-numbers nil
+		      :with-toc nil))
+  (org-html-stable-ids-remove)
+#+end_src
+
+#+RESULTS:
+
+#+headers: :cache yes
+#+headers: :exports results
+#+headers: :results scalar
+#+begin_src shell
+  cat example-6.html | grep "<h2 id="
+#+end_src
+
+#+RESULTS[b9d6b8f9bd4da8321100bc141f378bb1ad953b3f]:
+: <h2 id="hello-world">Hello, world!</h2>
+: <h2 id="hello-world">Another headline!</h2>
