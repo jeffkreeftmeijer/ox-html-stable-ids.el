@@ -57,7 +57,6 @@ By overriding the latter, we can get the exporter to assign custom IDs to the do
 We'll write an advise to override the implementation of the =org-export-get-reference= function.
 To make the custom function easy to switch on and off, we'll write two helper functions:
 
-#+headers: :tangle ox-html-stable-ids.el
 #+begin_src emacs-lisp
   (defun org-html-stable-ids-add ()
     (interactive)
@@ -234,7 +233,6 @@ It holds a cons with the ID and the element.
 If the function is called again with the same element, the ID is taken from the property list and returned.
 However, if it's called with new element which resolves to an ID that's already in the property list, the function retuns an error:
 
-#+headers: :tangle ox-html-stable-ids.el
 #+begin_src emacs-lisp
   (defun org-html-stable-ids--get-reference (datum info)
     (let ((cache (plist-get info :internal-references)))
@@ -340,3 +338,77 @@ Currently, it doesn't:
 #+RESULTS[b9d6b8f9bd4da8321100bc141f378bb1ad953b3f]:
 : <h2 id="hello-world">Hello, world!</h2>
 : <h2 id="hello-world">Another headline!</h2>
+
+This is caused by a function named =org-html--reference=, which circumvents =org-export-get-reference= when custom IDs are set.
+To ensure all IDs are checked against the internal references list, we override =org-html--reference= to call =org-export-get-reference= directly:[fn:override]
+
+[fn:override]: The =org-html--reference= function has added logic to check the /html-prefer-user-labels/ attribute.
+By calling out to =org-export-get-reference= directly, that functionality is lost, meaning this library implies the /html-prefer-user-labels/ setting.
+
+
+#+headers: :tangle ox-html-stable-ids.el
+#+begin_src emacs-lisp
+  (defun org-html-stable-ids-add ()
+    (interactive)
+    (advice-add #'org-export-get-reference :override #'org-html-stable-ids--get-reference)
+    (advice-add #'org-html--reference :override #'org-html-stable-ids--reference))
+
+  (defun org-html-stable-ids-remove ()
+    (interactive)
+    (advice-remove #'org-export-get-reference #'org-html-stable-ids--get-reference)
+    (advice-remove #'org-html--reference #'org-html-stable-ids--reference))
+#+end_src
+
+#+RESULTS:
+: org-html-stable-ids-remove
+
+#+headers: :tangle ox-html-stable-ids.el
+#+begin_src emacs-lisp
+  (defun org-html-stable-ids--reference (datum info &optional named-only)
+    (org-export-get-reference datum info))
+#+end_src
+
+#+RESULTS:
+: org-html-stable-ids--reference
+
+Then, in our overridden version, we check if a custom ID is set before generating an ID from the element's value:
+
+#+headers: :tangle ox-html-stable-ids.el
+#+begin_src emacs-lisp
+  (defun org-html-stable-ids--get-reference (datum info)
+    (let ((cache (plist-get info :internal-references)))
+      (let ((id (or
+		 (org-element-property :CUSTOM_ID datum)
+		 (org-html-stable-ids--to-kebab-case
+		  (org-element-property :raw-value datum)))))
+	(or (rassq datum cache)
+	    (if (assoc id cache)
+		(user-error "Duplicate ID: %s" id)
+	      (push (cons id datum) cache)
+	      (plist-put info :internal-references cache)
+	      id)))))
+#+end_src
+
+#+RESULTS:
+: org-html-stable-ids--get-reference
+
+#+headers: :exports none
+#+begin_src emacs-lisp
+  (org-html-stable-ids-add)
+  (org-publish-file "example-6.org"
+		    '("ox-html-stable-ids"
+	              :publishing-function org-html-publish-to-html
+		      :base-directory "."
+		      :publishing-directory "."
+		      :section-numbers nil
+		      :with-toc nil))
+  (org-html-stable-ids-remove)
+#+end_src
+
+#+RESULTS:
+
+Publishing the example again produces the expected error:
+
+#+begin_example
+Duplicate ID: hello-world
+#+end_example

@@ -1,21 +1,28 @@
-(defun org-html-stable-ids-add ()
-  (interactive)
-  (advice-add #'org-export-get-reference :override #'org-html-stable-ids--get-reference))
-
-(defun org-html-stable-ids-remove ()
-  (interactive)
-  (advice-remove #'org-export-get-reference #'org-html-stable-ids--get-reference))
-
 (defun org-html-stable-ids--to-kebab-case (string)
   (string-trim
    (replace-regexp-in-string "[^a-z0-9]+" "-"
                              (downcase string))
    "-" "-"))
 
+(defun org-html-stable-ids-add ()
+  (interactive)
+  (advice-add #'org-export-get-reference :override #'org-html-stable-ids--get-reference)
+  (advice-add #'org-html--reference :override #'org-html-stable-ids--reference))
+
+(defun org-html-stable-ids-remove ()
+  (interactive)
+  (advice-remove #'org-export-get-reference #'org-html-stable-ids--get-reference)
+  (advice-remove #'org-html--reference #'org-html-stable-ids--reference))
+
+(defun org-html-stable-ids--reference (datum info &optional named-only)
+  (org-export-get-reference datum info))
+
 (defun org-html-stable-ids--get-reference (datum info)
   (let ((cache (plist-get info :internal-references)))
-    (let ((id (org-html-stable-ids--to-kebab-case
-	       (org-element-property :raw-value datum))))
+    (let ((id (or
+	       (org-element-property :CUSTOM_ID datum)
+	       (org-html-stable-ids--to-kebab-case
+		(org-element-property :raw-value datum)))))
       (or (rassq datum cache)
 	  (if (assoc id cache)
 	      (user-error "Duplicate ID: %s" id)
