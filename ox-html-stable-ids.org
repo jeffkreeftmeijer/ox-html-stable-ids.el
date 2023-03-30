@@ -180,3 +180,39 @@ Now, all headlines in the file get assigned IDs that match their contents:
 #+RESULTS[7ca8f72e3c8cf16f3aeb35f5f6e42e8d2c705f5f]:
 : <h2 id="hello-world">Hello, world!</h2>
 : <h2 id="another-headline">Another headline!</h2>
+
+If a headline has a ~CUSTOM_ID~, that's used instead of the generated one:
+
+#+begin_src org :tangle example-4.org
+  ,* Hello, world!
+  ,* Another headline!
+  :PROPERTIES:
+  :CUSTOM_ID: custom-id
+  :END:
+#+end_src
+
+#+headers: :exports none
+#+begin_src emacs-lisp
+  (org-html-stable-ids-add)
+  (org-publish-file "example-4.org"
+		    '("ox-html-stable-ids"
+	              :publishing-function org-html-publish-to-html
+		      :base-directory "."
+		      :publishing-directory "."
+		      :section-numbers nil
+		      :with-toc nil))
+  (org-html-stable-ids-remove)
+#+end_src
+
+#+RESULTS:
+
+#+headers: :cache yes
+#+headers: :exports results
+#+headers: :results scalar
+#+begin_src shell
+  cat example-4.html | grep "<h2 id="
+#+end_src
+
+#+RESULTS[822b32d5e73e239d9f625fd73b224b0dab021a65]:
+: <h2 id="hello-world">Hello, world!</h2>
+: <h2 id="custom-id">Another headline!</h2>
