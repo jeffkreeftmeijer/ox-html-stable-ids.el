@@ -1,6 +1,5 @@
 #+title: ox-html-stable-ids
 
-#+headers: :exports none
 #+begin_src org :tangle example.org
   ,* Hello, world!
 #+end_src
@@ -131,17 +130,24 @@ To have the IDs match each separate headline's contents, take the headline from 
 #+RESULTS:
 : multiple-headlines-test
 
-#+headers: :tangle oxhtml-stable-ids.el
+#+name: kebab-case
+#+headers: :tangle ox-html-stable-ids.el
+#+headers: :exports none
 #+begin_src emacs-lisp
-  (defun org-html-stable-ids--get-reference (datum info)
-    (org-html-stable-ids--to-kebab-case
-     (org-element-property :raw-value datum)))
-
   (defun org-html-stable-ids--to-kebab-case (string)
     (string-trim
      (replace-regexp-in-string "[^a-z0-9]+" "-"
                                (downcase string))
      "-" "-"))
+#+end_src
+
+#+headers: :noweb yes
+#+begin_src emacs-lisp
+  <<kebab-case>>
+
+  (defun org-html-stable-ids--get-reference (datum info)
+    (org-html-stable-ids--to-kebab-case
+     (org-element-property :raw-value datum)))
 #+end_src
 
 #+RESULTS:
@@ -216,3 +222,87 @@ If a headline has a ~CUSTOM_ID~, that's used instead of the generated one:
 #+RESULTS[822b32d5e73e239d9f625fd73b224b0dab021a65]:
 : <h2 id="hello-world">Hello, world!</h2>
 : <h2 id="custom-id">Another headline!</h2>
+
+In the current implementation, multiple headlines with the same contents get assigned the same ID.
+Instead of making the headlines custom by adding numbers to the end, the exporter should raise an error and quit.
+It's up to the author to update the document by giving the headlines meaningful custom IDs.
+
+Exporting a document with duplicate IDs should raise an error.
+To do so, each ID needs to be added to a cache when it's created, much like the original implementation of =org-get-reference=.
+Whenever an ID is requested, an /internal-references/ key is added to the /info/ property list if it doesn't exist yet.
+It holds a cons with the ID and the element.
+If the function is called again with the same element, the ID is taken from the property list and returned.
+However, if it's called with new element which resolves to an ID that's already in the property list, the function retuns an error:
+
+#+headers: :tangle ox-html-stable-ids.el
+#+begin_src emacs-lisp
+  (defun org-html-stable-ids--get-reference (datum info)
+    (let ((cache (plist-get info :internal-references)))
+      (let ((id (org-html-stable-ids--to-kebab-case
+		 (org-element-property :raw-value datum))))
+	(or (rassq datum cache)
+	    (if (assoc id cache)
+		(user-error "Duplicate ID: %s" id)
+	      (push (cons id datum) cache)
+	      (plist-put info :internal-references cache)
+	      id)))))
+#+end_src
+
+#+RESULTS:
+: org-html-stable-ids--get-reference
+
+Now, the function raises an error when two headlines resolve to the same ID:
+
+#+begin_src org :tangle example-5.org
+  ,* Hello, world!
+  ,* Hello, world!
+#+end_src
+
+#+headers: :exports none
+#+headers: :tangle test.el
+#+begin_src emacs-lisp
+  (ert-deftest duplicate-headlines-test ()
+    (org-html-stable-ids-add)
+    (find-file "example-5.org")
+    (should-error (org-html-export-as-html))
+    (org-html-stable-ids-remove))
+#+end_src
+
+#+RESULTS:
+: duplicate-headlines-test
+
+#+headers: :exports none
+#+begin_src emacs-lisp
+  (org-html-stable-ids-add)
+  (org-publish-file "example-5.org"
+		    '("ox-html-stable-ids"
+		      :publishing-function org-html-publish-to-html
+		      :base-directory "."
+		      :publishing-directory "."
+		      :section-numbers nil
+		      :with-toc nil))
+  (org-html-stable-ids-remove)
+#+end_src
+
+#+RESULTS:
+
+#+begin_example
+Duplicate ID: hello-world
+#+end_example
+
+#+headers: :tangle ox-html-stable-ids.el
+#+begin_src emacs-lisp
+  (defun org-html-stable-ids--get-reference (datum info)
+    (let ((cache (plist-get info :internal-references)))
+      (let ((id (org-html-stable-ids--to-kebab-case
+		 (org-element-property :raw-value datum))))
+	(or (rassq datum cache)
+	    (if (assoc id cache)
+		(user-error "Duplicate ID: %s" id)
+	      (push (cons id datum) cache)
+	      (plist-put info :internal-references cache)
+	      id)))))
+#+end_src
+
+#+RESULTS:
+: org-html-stable-ids--get-reference

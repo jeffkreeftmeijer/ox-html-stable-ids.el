@@ -18,3 +18,9 @@
     (should (string-match-p "<h2 id=\"hello-world" buffer))
     (should (string-match-p "<h2 id=\"another-headline" buffer)))
   (org-html-stable-ids-remove))
+
+(ert-deftest duplicate-headlines-test ()
+  (org-html-stable-ids-add)
+  (find-file "example-5.org")
+  (should-error (org-html-export-as-html))
+  (org-html-stable-ids-remove))
