@@ -8,12 +8,12 @@
 #+headers: :exports none
 #+begin_src emacs-lisp
   (org-publish-file "example.org"
-		    '("ox-html-stable-ids"
-	              :publishing-function org-html-publish-to-html
-		      :base-directory "."
-		      :publishing-directory "."
-		      :section-numbers nil
-		      :with-toc nil))
+                    '("ox-html-stable-ids"
+                      :publishing-function org-html-publish-to-html
+                      :base-directory "."
+                      :publishing-directory "."
+                      :section-numbers nil
+                      :with-toc nil))
 #+end_src
 
 #+RESULTS:
@@ -47,8 +47,8 @@ In the example above, that ID would be "hello-world".
     (find-file "example.org")
     (org-html-export-as-html)
     (should (string-match-p
-	     "<h2 id=\"hello-world"
-	     (with-current-buffer "*Org HTML Export*" (buffer-string))))
+             "<h2 id=\"hello-world"
+             (with-current-buffer "*Org HTML Export*" (buffer-string))))
     (org-html-stable-ids-remove))
 #+end_src
 
@@ -90,12 +90,12 @@ As expected, the result used "hello-world" as the ID for all headlines:
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
   (org-publish-file "example-2.org"
-		    '("ox-html-stable-ids"
+                    '("ox-html-stable-ids"
                       :publishing-function org-html-publish-to-html
-		      :base-directory "."
-		      :publishing-directory "."
-		      :section-numbers nil
-		      :with-toc nil))
+                      :base-directory "."
+                      :publishing-directory "."
+                      :section-numbers nil
+                      :with-toc nil))
   (org-html-stable-ids-remove)
 #+end_src
 
@@ -164,12 +164,12 @@ Now, all headlines in the file get assigned IDs that match their contents:
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
   (org-publish-file "example-3.org"
-		    '("ox-html-stable-ids"
-	              :publishing-function org-html-publish-to-html
-		      :base-directory "."
-		      :publishing-directory "."
-		      :section-numbers nil
-		      :with-toc nil))
+                    '("ox-html-stable-ids"
+                      :publishing-function org-html-publish-to-html
+                      :base-directory "."
+                      :publishing-directory "."
+                      :section-numbers nil
+                      :with-toc nil))
   (org-html-stable-ids-remove)
 #+end_src
 
@@ -200,12 +200,12 @@ If a headline has a ~CUSTOM_ID~, that's used instead of the generated one:
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
   (org-publish-file "example-4.org"
-		    '("ox-html-stable-ids"
-	              :publishing-function org-html-publish-to-html
-		      :base-directory "."
-		      :publishing-directory "."
-		      :section-numbers nil
-		      :with-toc nil))
+                    '("ox-html-stable-ids"
+                      :publishing-function org-html-publish-to-html
+                      :base-directory "."
+                      :publishing-directory "."
+                      :section-numbers nil
+                      :with-toc nil))
   (org-html-stable-ids-remove)
 #+end_src
 
@@ -237,13 +237,13 @@ However, if it's called with new element which resolves to an ID that's already 
   (defun org-html-stable-ids--get-reference (datum info)
     (let ((cache (plist-get info :internal-references)))
       (let ((id (org-html-stable-ids--to-kebab-case
-		 (org-element-property :raw-value datum))))
-	(or (rassq datum cache)
-	    (if (assoc id cache)
-		(user-error "Duplicate ID: %s" id)
-	      (push (cons id datum) cache)
-	      (plist-put info :internal-references cache)
-	      id)))))
+                 (org-element-property :raw-value datum))))
+        (or (rassq datum cache)
+            (if (assoc id cache)
+                (user-error "Duplicate ID: %s" id)
+              (push (cons id datum) cache)
+              (plist-put info :internal-references cache)
+              id)))))
 #+end_src
 
 #+RESULTS:
@@ -273,12 +273,12 @@ Now, the function raises an error when two headlines resolve to the same ID:
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
   (org-publish-file "example-5.org"
-		    '("ox-html-stable-ids"
-		      :publishing-function org-html-publish-to-html
-		      :base-directory "."
-		      :publishing-directory "."
-		      :section-numbers nil
-		      :with-toc nil))
+                    '("ox-html-stable-ids"
+                      :publishing-function org-html-publish-to-html
+                      :base-directory "."
+                      :publishing-directory "."
+                      :section-numbers nil
+                      :with-toc nil))
   (org-html-stable-ids-remove)
 #+end_src
 
@@ -317,12 +317,12 @@ Currently, it doesn't:
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
   (org-publish-file "example-6.org"
-		    '("ox-html-stable-ids"
-	              :publishing-function org-html-publish-to-html
-		      :base-directory "."
-		      :publishing-directory "."
-		      :section-numbers nil
-		      :with-toc nil))
+                    '("ox-html-stable-ids"
+                      :publishing-function org-html-publish-to-html
+                      :base-directory "."
+                      :publishing-directory "."
+                      :section-numbers nil
+                      :with-toc nil))
   (org-html-stable-ids-remove)
 #+end_src
 
@@ -377,15 +377,15 @@ Then, in our overridden version, we check if a custom ID is set before generatin
   (defun org-html-stable-ids--get-reference (datum info)
     (let ((cache (plist-get info :internal-references)))
       (let ((id (or
-		 (org-element-property :CUSTOM_ID datum)
-		 (org-html-stable-ids--to-kebab-case
-		  (org-element-property :raw-value datum)))))
-	(or (rassq datum cache)
-	    (if (assoc id cache)
-		(user-error "Duplicate ID: %s" id)
-	      (push (cons id datum) cache)
-	      (plist-put info :internal-references cache)
-	      id)))))
+                 (org-element-property :CUSTOM_ID datum)
+                 (org-html-stable-ids--to-kebab-case
+                  (org-element-property :raw-value datum)))))
+        (or (rassq datum cache)
+            (if (assoc id cache)
+                (user-error "Duplicate ID: %s" id)
+              (push (cons id datum) cache)
+              (plist-put info :internal-references cache)
+              id)))))
 #+end_src
 
 
@@ -396,12 +396,12 @@ Then, in our overridden version, we check if a custom ID is set before generatin
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
   (org-publish-file "example-6.org"
-		    '("ox-html-stable-ids"
-	              :publishing-function org-html-publish-to-html
-		      :base-directory "."
-		      :publishing-directory "."
-		      :section-numbers nil
-		      :with-toc nil))
+                    '("ox-html-stable-ids"
+                      :publishing-function org-html-publish-to-html
+                      :base-directory "."
+                      :publishing-directory "."
+                      :section-numbers nil
+                      :with-toc nil))
   (org-html-stable-ids-remove)
 #+end_src
 
@@ -463,12 +463,12 @@ Call =org-html-stable-ids-add= before publishing a file:
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
   (org-publish-file "example.org"
-		    '("ox-html-stable-ids"
-	              :publishing-function org-html-publish-to-html
-		      :base-directory "."
-		      :publishing-directory "."
-		      :section-numbers nil
-		      :with-toc nil))
+                    '("ox-html-stable-ids"
+                      :publishing-function org-html-publish-to-html
+                      :base-directory "."
+                      :publishing-directory "."
+                      :section-numbers nil
+                      :with-toc nil))
   (org-html-stable-ids-remove)
 #+end_src
 

@@ -48,14 +48,14 @@ Return the element's :CUSTOM_ID, or an id generated from its
 document before."
   (let ((cache (plist-get info :internal-references)))
     (let ((id (or
-	       (org-element-property :CUSTOM_ID datum)
-	       (org-html-stable-ids--to-kebab-case
-		(org-element-property :raw-value datum)))))
+               (org-element-property :CUSTOM_ID datum)
+               (org-html-stable-ids--to-kebab-case
+                (org-element-property :raw-value datum)))))
       (or (rassq datum cache)
-	  (if (assoc id cache)
-	      (user-error "Duplicate ID: %s" id)
-	    (push (cons id datum) cache)
-	    (plist-put info :internal-references cache)
-	    id)))))
+          (if (assoc id cache)
+              (user-error "Duplicate ID: %s" id)
+            (push (cons id datum) cache)
+            (plist-put info :internal-references cache)
+            id)))))
 
 ;;; ox-html-stable-ids.el ends here
