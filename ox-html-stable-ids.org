@@ -134,6 +134,7 @@ To have the IDs match each separate headline's contents, take the headline from 
 #+headers: :exports none
 #+begin_src emacs-lisp
   (defun org-html-stable-ids--to-kebab-case (string)
+    "Convert STRING to kebab-case."
     (string-trim
      (replace-regexp-in-string "[^a-z0-9]+" "-"
                                (downcase string))
@@ -348,11 +349,13 @@ By calling out to =org-export-get-reference= directly, that functionality is los
 #+name: add-remove
 #+begin_src emacs-lisp
   (defun org-html-stable-ids-add ()
+    "Enable org-html-stable-ids."
     (interactive)
     (advice-add #'org-export-get-reference :override #'org-html-stable-ids--get-reference)
     (advice-add #'org-html--reference :override #'org-html-stable-ids--reference))
 
   (defun org-html-stable-ids-remove ()
+    "Disable org-html-stable-ids."
     (interactive)
     (advice-remove #'org-export-get-reference #'org-html-stable-ids--get-reference)
     (advice-remove #'org-html--reference #'org-html-stable-ids--reference))
@@ -364,6 +367,9 @@ By calling out to =org-export-get-reference= directly, that functionality is los
 #+name: org-html-reference
 #+begin_src emacs-lisp
   (defun org-html-stable-ids--reference (datum info &optional named-only)
+    "Call `org-export-get-reference` to get a reference for DATUM with INFO.
+  The NAMED-ONLY argument is ignored, as `org-export-get-reference`
+  always returns a reference."
     (org-export-get-reference datum info))
 #+end_src
 
@@ -375,6 +381,11 @@ Then, in our overridden version, we check if a custom ID is set before generatin
 #+name: org-reference
 #+begin_src emacs-lisp
   (defun org-html-stable-ids--get-reference (datum info)
+    "Return a reference for DATUM with INFO.
+
+  Return the element's :CUSTOM_ID, or an id generated from its
+  `:raw-value` property.  Raise an error if the ID was used in the
+  document before."
     (let ((cache (plist-get info :internal-references)))
       (let ((id (or
                  (org-element-property :CUSTOM_ID datum)
