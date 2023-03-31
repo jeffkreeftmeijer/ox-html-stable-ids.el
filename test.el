@@ -27,6 +27,14 @@
     (should (string-match-p "<pre class=\"src src-shell\">" buffer)))
   (org-html-stable-ids-remove))
 
+(ert-deftest example-block-test ()
+  (org-html-stable-ids-add)
+  (find-file "test/fixtures/example-block.org")
+  (org-html-export-as-html)
+  (let ((buffer (with-current-buffer "*Org HTML Export*" (buffer-string))))
+    (should (string-match-p "<pre class=\"example\">" buffer)))
+  (org-html-stable-ids-remove))
+
 (ert-deftest duplicate-headlines-test ()
   (org-html-stable-ids-add)
   (find-file "test/fixtures/duplicate-headlines.org")
