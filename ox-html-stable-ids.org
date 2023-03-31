@@ -2,13 +2,13 @@
 #+options: toc:nil
 
 #+headers: :exports none
-#+begin_src org :tangle example.org
+#+begin_src org :tangle test/fixtures/hello-world.org
   ,* Hello, world!
 #+end_src
 
 #+headers: :exports none
 #+begin_src emacs-lisp
-  (org-publish-file "example.org"
+  (org-publish-file "test/fixtures/hello-world.org"
                     '("ox-html-stable-ids"
                       :publishing-function org-html-publish-to-html
                       :base-directory "."
@@ -27,7 +27,7 @@ By default, these are random, so a headline might get assigned ~org81963c6~ as i
 #+headers: :exports results
 #+headers: :results scalar
 #+begin_src shell
-  cat example.html | grep "<h2 id="
+  cat test/fixtures/hello-world.html | grep "<h2 id="
 #+end_src
 
 #+RESULTS[bceb2028e92191632ebd6a8816fa0dfa61629e2e]:
@@ -45,7 +45,7 @@ In the example above, that ID would be "hello-world".
 
   (ert-deftest hello-world-test ()
     (org-html-stable-ids-add)
-    (find-file "example.org")
+    (find-file "test/fixtures/hello-world.org")
     (org-html-export-as-html)
     (should (string-match-p
              "<h2 id=\"hello-world"
@@ -82,7 +82,7 @@ To check if everything is hooked up correctly, we'll define =org-html-stable-ids
 As expected, the result used "hello-world" as the ID for all headlines:
 
 #+headers: :exports none
-#+begin_src org :tangle example-2.org
+#+begin_src org :tangle test/fixtures/multiple-headlines-fail.org
   ,* Hello, world!
   ,* Another headline!
 #+end_src
@@ -90,7 +90,7 @@ As expected, the result used "hello-world" as the ID for all headlines:
 #+headers: :exports none
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
-  (org-publish-file "example-2.org"
+  (org-publish-file "test/fixtures/multiple-headlines-fail.org"
                     '("ox-html-stable-ids"
                       :publishing-function org-html-publish-to-html
                       :base-directory "."
@@ -106,7 +106,7 @@ As expected, the result used "hello-world" as the ID for all headlines:
 #+headers: :exports results
 #+headers: :results scalar
 #+begin_src shell
-  cat example-2.html | grep "<h2 id="
+  cat test/fixtures/multiple-headlines-fail.html | grep "<h2 id="
 #+end_src
 
 #+RESULTS[564a1f36688d42106a6f84efdae6067cf4bcbfd3]:
@@ -120,7 +120,7 @@ To have the IDs match each separate headline's contents, take the headline from 
 #+begin_src emacs-lisp
   (ert-deftest multiple-headlines-test ()
     (org-html-stable-ids-add)
-    (find-file "example-3.org")
+    (find-file "test/fixtures/multiple-headlines.org")
     (org-html-export-as-html)
     (let ((buffer (with-current-buffer "*Org HTML Export*" (buffer-string))))
       (should (string-match-p "<h2 id=\"hello-world" buffer))
@@ -157,7 +157,7 @@ To have the IDs match each separate headline's contents, take the headline from 
 Now, all headlines in the file get assigned IDs that match their contents:
 
 #+headers: :exports none
-#+begin_src org :tangle example-3.org
+#+begin_src org :tangle test/fixtures/multiple-headlines.org
   ,* Hello, world!
   ,* Another headline!
 #+end_src
@@ -165,7 +165,7 @@ Now, all headlines in the file get assigned IDs that match their contents:
 #+headers: :exports none
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
-  (org-publish-file "example-3.org"
+  (org-publish-file "test/fixtures/multiple-headlines.org"
                     '("ox-html-stable-ids"
                       :publishing-function org-html-publish-to-html
                       :base-directory "."
@@ -181,7 +181,7 @@ Now, all headlines in the file get assigned IDs that match their contents:
 #+headers: :exports results
 #+headers: :results scalar
 #+begin_src shell
-  cat example-3.html | grep "<h2 id="
+  cat test/fixtures/multiple-headlines.html | grep "<h2 id="
 #+end_src
 
 #+RESULTS[7ca8f72e3c8cf16f3aeb35f5f6e42e8d2c705f5f]:
@@ -190,7 +190,7 @@ Now, all headlines in the file get assigned IDs that match their contents:
 
 If a headline has a ~CUSTOM_ID~, that's used instead of the generated one:
 
-#+begin_src org :tangle example-4.org
+#+begin_src org :tangle test/fixtures/cutom-id.org
   ,* Hello, world!
   ,* Another headline!
   :PROPERTIES:
@@ -201,7 +201,7 @@ If a headline has a ~CUSTOM_ID~, that's used instead of the generated one:
 #+headers: :exports none
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
-  (org-publish-file "example-4.org"
+  (org-publish-file "test/fixtures/cutom-id.org"
                     '("ox-html-stable-ids"
                       :publishing-function org-html-publish-to-html
                       :base-directory "."
@@ -217,7 +217,7 @@ If a headline has a ~CUSTOM_ID~, that's used instead of the generated one:
 #+headers: :exports results
 #+headers: :results scalar
 #+begin_src shell
-  cat example-4.html | grep "<h2 id="
+  cat test/fixtures/cutom-id.html | grep "<h2 id="
 #+end_src
 
 #+RESULTS[822b32d5e73e239d9f625fd73b224b0dab021a65]:
@@ -253,7 +253,7 @@ However, if it's called with new element which resolves to an ID that's already 
 
 Now, the function raises an error when two headlines resolve to the same ID:
 
-#+begin_src org :tangle example-5.org
+#+begin_src org :tangle test/fixtures/duplicate-headlines.org
   ,* Hello, world!
   ,* Hello, world!
 #+end_src
@@ -263,7 +263,7 @@ Now, the function raises an error when two headlines resolve to the same ID:
 #+begin_src emacs-lisp
   (ert-deftest duplicate-headlines-test ()
     (org-html-stable-ids-add)
-    (find-file "example-5.org")
+    (find-file "test/fixtures/duplicate-headlines.org")
     (should-error (org-html-export-as-html))
     (org-html-stable-ids-remove))
 #+end_src
@@ -274,7 +274,7 @@ Now, the function raises an error when two headlines resolve to the same ID:
 #+headers: :exports none
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
-  (org-publish-file "example-5.org"
+  (org-publish-file "test/fixtures/duplicate-headlines.org"
                     '("ox-html-stable-ids"
                       :publishing-function org-html-publish-to-html
                       :base-directory "."
@@ -294,7 +294,7 @@ In another scenario, one headline has a custom ID that matches a previously reso
 Because this yields duplicate IDs, this should also raise an error.
 Currently, it doesn't:
 
-#+begin_src org :tangle example-6.org
+#+begin_src org :tangle test/fixtures/duplicate-headlines-with-custom-id.org
   ,* Hello, world!
   ,* Another headline!
   :PROPERTIES:
@@ -307,7 +307,7 @@ Currently, it doesn't:
 #+begin_src emacs-lisp
   (ert-deftest duplicate-headlines-with-custom-id-test ()
     (org-html-stable-ids-add)
-    (find-file "example-6.org")
+    (find-file "test/fixtures/duplicate-headlines-with-custom-id.org")
     (should-error (org-html-export-as-html))
     (org-html-stable-ids-remove))
 #+end_src
@@ -318,7 +318,7 @@ Currently, it doesn't:
 #+headers: :exports none
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
-  (org-publish-file "example-6.org"
+  (org-publish-file "test/fixtures/duplicate-headlines-with-custom-id.org"
                     '("ox-html-stable-ids"
                       :publishing-function org-html-publish-to-html
                       :base-directory "."
@@ -334,7 +334,7 @@ Currently, it doesn't:
 #+headers: :exports results
 #+headers: :results scalar
 #+begin_src shell
-  cat example-6.html | grep "<h2 id="
+  cat test/fixtures/duplicate-headlines-with-custom-id.html | grep "<h2 id="
 #+end_src
 
 #+RESULTS[b9d6b8f9bd4da8321100bc141f378bb1ad953b3f]:
@@ -407,7 +407,7 @@ Then, in our overridden version, we check if a custom ID is set before generatin
 #+headers: :exports none
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
-  (org-publish-file "example-6.org"
+  (org-publish-file "test/fixtures/duplicate-headlines-with-custom-id.org"
                     '("ox-html-stable-ids"
                       :publishing-function org-html-publish-to-html
                       :base-directory "."
@@ -474,7 +474,7 @@ Call =org-html-stable-ids-add= before publishing a file:
 
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
-  (org-publish-file "example.org"
+  (org-publish-file "test/fixtures/hello-world.org"
                     '("ox-html-stable-ids"
                       :publishing-function org-html-publish-to-html
                       :base-directory "."
@@ -492,7 +492,7 @@ Get stable IDs:
 #+headers: :exports results
 #+headers: :results scalar
 #+begin_src shell
-  cat example.html | grep "<h2 id="
+  cat test/fixtures/hello-world.html | grep "<h2 id="
 #+end_src
 
 #+RESULTS[bceb2028e92191632ebd6a8816fa0dfa61629e2e]:
