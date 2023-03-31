@@ -347,6 +347,7 @@ To ensure all IDs are checked against the internal references list, we override 
 [fn:override]: The =org-html--reference= function has added logic to check the /html-prefer-user-labels/ attribute.
 By calling out to =org-export-get-reference= directly, that functionality is lost, meaning this library implies the /html-prefer-user-labels/ setting.
 
+
 #+name: add-remove
 #+begin_src emacs-lisp
   (defun org-html-stable-ids-add ()
