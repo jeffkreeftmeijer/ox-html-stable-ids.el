@@ -134,7 +134,7 @@ Call `org-html-stable-ids-add` before publishing a file:
 
 ```emacs-lisp
 (org-html-stable-ids-add)
-(org-publish-file "example.org"
+(org-publish-file "test/fixtures/hello-world.org"
 		  '("ox-html-stable-ids"
 		    :publishing-function org-html-publish-to-html
 		    :base-directory "."
