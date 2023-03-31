@@ -261,6 +261,14 @@ Now, the function raises an error when two headlines resolve to the same ID:
 #+headers: :exports none
 #+headers: :tangle test.el
 #+begin_src emacs-lisp
+  (ert-deftest src-block-test ()
+    (org-html-stable-ids-add)
+    (find-file "test/fixtures/src-block.org")
+    (org-html-export-as-html)
+    (let ((buffer (with-current-buffer "*Org HTML Export*" (buffer-string))))
+      (should (string-match-p "<pre class=\"src src-shell\">" buffer)))
+    (org-html-stable-ids-remove))
+
   (ert-deftest duplicate-headlines-test ()
     (org-html-stable-ids-add)
     (find-file "test/fixtures/duplicate-headlines.org")
