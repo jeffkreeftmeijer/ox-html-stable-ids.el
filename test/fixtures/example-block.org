@@ -1,0 +1,8 @@
+#+begin_example
+ox-html-stable-ids.el
+ox-html-stable-ids.md
+ox-html-stable-ids.org
+scripts
+test
+test.el
+#+end_example
