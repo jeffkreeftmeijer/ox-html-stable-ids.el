@@ -23,6 +23,8 @@
 
 (require 'ox-md-title)
 
+(setq make-backup-files nil)
+
 (defun publish ()
   (org-md-title-add)
   (org-publish-file "ox-html-stable-ids.org"
