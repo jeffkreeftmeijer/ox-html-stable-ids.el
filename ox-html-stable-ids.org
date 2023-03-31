@@ -500,8 +500,8 @@ Get stable IDs:
 * Tasks                                                            :noexport:
 
 ** DONE Add boilerplate
+** DONE Run tests on CI
 ** TODO Add Markdown README
-** TODO Run tests on CI
 ** TODO Add option to toggle stable IDs in publish project
 
 - option: =:stable-ids=
