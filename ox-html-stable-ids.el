@@ -36,9 +36,10 @@
 
 (defun org-html-stable-ids--reference (datum info &optional named-only)
   "Call `org-export-get-reference` to get a reference for DATUM with INFO.
-The NAMED-ONLY argument is ignored, as `org-export-get-reference`
-always returns a reference."
-  (org-export-get-reference datum info))
+
+If `NAMED-ONLY` is non-nil, return nil."
+  (unless named-only
+    (org-export-get-reference datum info)))
 
 (defun org-html-stable-ids--get-reference (datum info)
   "Return a reference for DATUM with INFO.

@@ -378,9 +378,10 @@ By calling out to =org-export-get-reference= directly, that functionality is los
 #+begin_src emacs-lisp
   (defun org-html-stable-ids--reference (datum info &optional named-only)
     "Call `org-export-get-reference` to get a reference for DATUM with INFO.
-  The NAMED-ONLY argument is ignored, as `org-export-get-reference`
-  always returns a reference."
-    (org-export-get-reference datum info))
+
+  If `NAMED-ONLY` is non-nil, return nil."
+    (unless named-only
+      (org-export-get-reference datum info)))
 #+end_src
 
 #+RESULTS:
