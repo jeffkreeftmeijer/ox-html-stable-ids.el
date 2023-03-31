@@ -453,3 +453,15 @@ Get stable IDs:
 
 #+RESULTS[bceb2028e92191632ebd6a8816fa0dfa61629e2e]:
 : <h2 id="hello-world">Hello, world!</h2>
+
+* Tasks                                                            :noexport:
+
+** TODO Add boilerplate
+** TODO Add Markdown README
+** TODO Run tests on CI
+** TODO Add option to toggle stable IDs in publish project
+
+- option: =:stable-ids=
+- variable: =org-export-with-stable-ids=
+
+** TODO Honor named-only in =org-html-stable-ids--reference= returning nil if named-only is t
