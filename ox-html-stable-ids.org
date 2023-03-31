@@ -1,4 +1,5 @@
 #+title: ox-html-stable-ids
+#+options: toc:nil
 
 #+headers: :exports none
 #+begin_src org :tangle example.org
