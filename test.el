@@ -3,7 +3,7 @@
 
 (ert-deftest hello-world-test ()
   (org-html-stable-ids-add)
-  (find-file "example.org")
+  (find-file "test/fixtures/hello-world.org")
   (org-html-export-as-html)
   (should (string-match-p
            "<h2 id=\"hello-world"
@@ -12,7 +12,7 @@
 
 (ert-deftest multiple-headlines-test ()
   (org-html-stable-ids-add)
-  (find-file "example-3.org")
+  (find-file "test/fixtures/multiple-headlines.org")
   (org-html-export-as-html)
   (let ((buffer (with-current-buffer "*Org HTML Export*" (buffer-string))))
     (should (string-match-p "<h2 id=\"hello-world" buffer))
@@ -21,12 +21,12 @@
 
 (ert-deftest duplicate-headlines-test ()
   (org-html-stable-ids-add)
-  (find-file "example-5.org")
+  (find-file "test/fixtures/duplicate-headlines.org")
   (should-error (org-html-export-as-html))
   (org-html-stable-ids-remove))
 
 (ert-deftest duplicate-headlines-with-custom-id-test ()
   (org-html-stable-ids-add)
-  (find-file "example-6.org")
+  (find-file "test/fixtures/duplicate-headlines-with-custom-id.org")
   (should-error (org-html-export-as-html))
   (org-html-stable-ids-remove))
