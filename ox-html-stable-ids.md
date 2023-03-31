@@ -109,49 +109,6 @@ In another scenario, one headline has a custom ID that matches a previously reso
 
 This is caused by a function named `org-html--reference`, which circumvents `org-export-get-reference` when custom IDs are set. To ensure all IDs are checked against the internal references list, we override `org-html--reference` to call `org-export-get-reference` directly:<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
 
-    org-html-stable-ids--get-reference
-
-Publishing the example again produces the expected error:
-
-```
-Duplicate ID: hello-world
-```
-
-
-# Usage
-
-Install ox-html-stable-ids with straight and use-package:
-
-```emacs-lisp
-(use-package ox-html-stable-ids
-  :straight '(ox-html-stable-ids
-	      :type git
-	      :host github
-	      :repo "jeffkreeftmeijer/ox-html-stable-ids.el"))
-```
-
-Call `org-html-stable-ids-add` before publishing a file:
-
-```emacs-lisp
-(org-html-stable-ids-add)
-(org-publish-file "test/fixtures/hello-world.org"
-		  '("ox-html-stable-ids"
-		    :publishing-function org-html-publish-to-html
-		    :base-directory "."
-		    :publishing-directory "."
-		    :section-numbers nil
-		    :with-toc nil))
-(org-html-stable-ids-remove)
-```
-
-Get stable IDs:
-
-    <h2 id="hello-world">Hello, world!</h2>
-
-## Footnotes
-
-<sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> : The `org-html--reference` function has added logic to check the *html-prefer-user-labels* attribute. By calling out to `org-export-get-reference` directly, that functionality is lost, meaning this library implies the *html-prefer-user-labels* setting.
-
 ```emacs-lisp
 (defun org-html-stable-ids-add ()
   "Enable org-html-stable-ids."
@@ -199,3 +156,46 @@ document before."
 	    (plist-put info :internal-references cache)
 	    id)))))
 ```
+
+    org-html-stable-ids--get-reference
+
+Publishing the example again produces the expected error:
+
+```
+Duplicate ID: hello-world
+```
+
+
+# Usage
+
+Install ox-html-stable-ids with straight and use-package:
+
+```emacs-lisp
+(use-package ox-html-stable-ids
+  :straight '(ox-html-stable-ids
+	      :type git
+	      :host github
+	      :repo "jeffkreeftmeijer/ox-html-stable-ids.el"))
+```
+
+Call `org-html-stable-ids-add` before publishing a file:
+
+```emacs-lisp
+(org-html-stable-ids-add)
+(org-publish-file "test/fixtures/hello-world.org"
+		  '("ox-html-stable-ids"
+		    :publishing-function org-html-publish-to-html
+		    :base-directory "."
+		    :publishing-directory "."
+		    :section-numbers nil
+		    :with-toc nil))
+(org-html-stable-ids-remove)
+```
+
+Get stable IDs:
+
+    <h2 id="hello-world">Hello, world!</h2>
+
+## Footnotes
+
+<sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> : The `org-html--reference` function has added logic to check the *html-prefer-user-labels* attribute. By calling out to `org-export-get-reference` directly, that functionality is lost, meaning this library implies the *html-prefer-user-labels* setting.
