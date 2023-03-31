@@ -1,7 +1,7 @@
 
 # ox-html-stable-ids
 
-- [Usage](#orgcbe0d3c)
+- [Usage](#org776f4fb)
 
 When publishing HTML with Org mode's exporters, the headlines in the resulting documents get assigned ID attributes. These are used as anchors, amongst other things. By default, these are random, so a headline might get assigned `org81963c6` as its ID:
 
@@ -120,7 +120,7 @@ Duplicate ID: hello-world
 ```
 
 
-<a id="orgcbe0d3c"></a>
+<a id="org776f4fb"></a>
 
 # Usage
 
