@@ -413,3 +413,43 @@ Publishing the example again produces the expected error:
 #+begin_example
 Duplicate ID: hello-world
 #+end_example
+
+* Usage
+
+Install ox-html-stable-ids with straight and use-package:
+
+#+begin_src emacs-lisp
+(use-package ox-html-stable-ids
+  :straight '(ox-html-stable-ids
+              :type git
+              :host github
+              :repo "jeffkreeftmeijer/ox-html-stable-ids.el"))
+#+end_src
+
+Call =org-html-stable-ids-add= before publishing a file:
+
+#+begin_src emacs-lisp
+  (org-html-stable-ids-add)
+  (org-publish-file "example.org"
+		    '("ox-html-stable-ids"
+	              :publishing-function org-html-publish-to-html
+		      :base-directory "."
+		      :publishing-directory "."
+		      :section-numbers nil
+		      :with-toc nil))
+  (org-html-stable-ids-remove)
+#+end_src
+
+#+RESULTS:
+
+Get stable IDs:
+
+#+headers: :cache yes
+#+headers: :exports results
+#+headers: :results scalar
+#+begin_src shell
+  cat example.html | grep "<h2 id="
+#+end_src
+
+#+RESULTS[bceb2028e92191632ebd6a8816fa0dfa61629e2e]:
+: <h2 id="hello-world">Hello, world!</h2>
