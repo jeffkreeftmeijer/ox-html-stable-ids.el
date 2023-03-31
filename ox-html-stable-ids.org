@@ -1,5 +1,6 @@
 #+title: ox-html-stable-ids
 
+#+headers: :exports none
 #+begin_src org :tangle example.org
   ,* Hello, world!
 #+end_src
