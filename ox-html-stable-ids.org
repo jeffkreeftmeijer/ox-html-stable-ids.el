@@ -240,7 +240,7 @@ However, if it's called with new element which resolves to an ID that's already 
     (let ((cache (plist-get info :internal-references)))
       (let ((id (org-html-stable-ids--to-kebab-case
                  (org-element-property :raw-value datum))))
-        (or (rassq datum cache)
+        (or (car (rassq datum cache))
             (if (assoc id cache)
                 (user-error "Duplicate ID: %s" id)
               (push (cons id datum) cache)
@@ -417,7 +417,7 @@ Then, in our overridden version, we check if a custom ID is set before generatin
   Raise an error if the ID was used in the document before."
     (let ((cache (plist-get info :internal-references))
 	  (id (org-html-stable-ids--extract-id datum)))
-      (or (rassq datum cache)
+      (or (car (rassq datum cache))
 	  (if (assoc id cache)
 	      (user-error "Duplicate ID: %s" id)
 	    (when id
