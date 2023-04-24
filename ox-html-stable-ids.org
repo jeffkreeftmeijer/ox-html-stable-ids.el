@@ -24,12 +24,15 @@ By default, these are random, so a headline might get assigned ~org81963c6~ as i
 #+headers: :cache yes
 #+headers: :exports results
 #+headers: :results scalar
+#+headers: :wrap src html
 #+begin_src shell
   cat test/fixtures/hello-world.html | grep "<h2 id="
 #+end_src
 
-#+RESULTS[5601f74505af4a12954423fe57fd55e9e2f2d691]:
-: <h2 id="org81963c6">Hello, world!</h2>
+#+RESULTS[33e999dd2bafcb1a0e7b04304bc8b645a7c7baf7]:
+#+begin_src html
+<h2 id="org81963c6">Hello, world!</h2>
+#+end_src
 
 Because subsequent exports of the same Org file produce different IDs, there's no way to bookmark a headline.
 Instead, it'd be useful to have stable IDs, based on the titles they're attached to.
@@ -98,13 +101,16 @@ As expected, the result used "hello-world" as the ID for all headlines:
 #+headers: :cache yes
 #+headers: :exports results
 #+headers: :results scalar
+#+headers: :wrap src html
 #+begin_src shell
   cat test/fixtures/multiple-headlines-fail.html | grep "<h2 id="
 #+end_src
 
-#+RESULTS[c6fbcb79ab1518ee8b2b7affe28fb8b4a2668bae]:
-: <h2 id="hello-world">Hello, world!</h2>
-: <h2 id="hello-world">Another headline!</h2>
+#+RESULTS[87a8b0ff437e744a81bdfb6409f87f365e8f86c9]:
+#+begin_src html
+<h2 id="hello-world">Hello, world!</h2>
+<h2 id="hello-world">Another headline!</h2>
+#+end_src
 
 To have the IDs match each separate headline's contents, take the headline from the =datum= parmeter with =org-element-property=:
 
@@ -165,13 +171,16 @@ Now, all headlines in the file get assigned IDs that match their contents:
 #+headers: :cache yes
 #+headers: :exports results
 #+headers: :results scalar
+#+headers: :wrap src html
 #+begin_src shell
   cat test/fixtures/multiple-headlines.html | grep "<h2 id="
 #+end_src
 
-#+RESULTS[acf3e5324f4dccff4208e99037ac727ee4cc7d00]:
-: <h2 id="hello-world">Hello, world!</h2>
-: <h2 id="another-headline">Another headline!</h2>
+#+RESULTS[d77a3ded5df0512226d22272ca65398c78af419a]:
+#+begin_src html
+<h2 id="hello-world">Hello, world!</h2>
+<h2 id="another-headline">Another headline!</h2>
+#+end_src
 
 If a headline has a ~CUSTOM_ID~, that's used instead of the generated one:
 
@@ -199,13 +208,16 @@ If a headline has a ~CUSTOM_ID~, that's used instead of the generated one:
 #+headers: :cache yes
 #+headers: :exports results
 #+headers: :results scalar
+#+headers: :wrap src html
 #+begin_src shell
   cat test/fixtures/cutom-id.html | grep "<h2 id="
 #+end_src
 
-#+RESULTS[276556cc9ce0461fc3f05c1b3189bd2d8a922925]:
-: <h2 id="hello-world">Hello, world!</h2>
-: <h2 id="custom-id">Another headline!</h2>
+#+RESULTS[1d4aada74dd82755e5d3f517f79ab943301db01f]:
+#+begin_src html
+<h2 id="hello-world">Hello, world!</h2>
+<h2 id="custom-id">Another headline!</h2>
+#+end_src
 
 In the current implementation, multiple headlines with the same contents get assigned the same ID.
 Instead of making the headlines custom by adding numbers to the end, the exporter should raise an error and quit.
@@ -319,13 +331,16 @@ Currently, it doesn't:
 #+headers: :cache yes
 #+headers: :exports results
 #+headers: :results scalar
+#+headers: :wrap src html
 #+begin_src shell
   cat test/fixtures/duplicate-headlines-with-custom-id.html | grep "<h2 id="
 #+end_src
 
-#+RESULTS[7fa89d5de28b6d8bb2a75e36c97c5b96fbea9d64]:
-: <h2 id="hello-world">Hello, world!</h2>
-: <h2 id="hello-world">Another headline!</h2>
+#+RESULTS[89df73837d0fe1b6348ca55230c3213d3f48a687]:
+#+begin_src html
+<h2 id="hello-world">Hello, world!</h2>
+<h2 id="hello-world">Another headline!</h2>
+#+end_src
 
 This is caused by a function named =org-html--reference=, which circumvents =org-export-get-reference= when custom IDs are set.
 To ensure all IDs are checked against the internal references list, we override =org-html--reference= to call =org-export-get-reference= directly:[fn:override]
@@ -473,9 +488,12 @@ Get stable IDs:
 #+headers: :cache yes
 #+headers: :exports results
 #+headers: :results scalar
+#+headers: :wrap src html
 #+begin_src shell
   cat test/fixtures/hello-world.html | grep "<h2 id="
 #+end_src
 
-#+RESULTS[5601f74505af4a12954423fe57fd55e9e2f2d691]:
-: <h2 id="hello-world">Hello, world!</h2>
+#+RESULTS[33e999dd2bafcb1a0e7b04304bc8b645a7c7baf7]:
+#+begin_src html
+<h2 id="hello-world">Hello, world!</h2>
+#+end_src
