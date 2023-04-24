@@ -3,7 +3,9 @@
 
 When publishing HTML with Org mode's exporters, the headlines in the resulting documents get assigned ID attributes. These are used as anchors, amongst other things. By default, these are random, so a headline might get assigned `org81963c6` as its ID:
 
-    <h2 id="org81963c6">Hello, world!</h2>
+```html
+<h2 id="org81963c6">Hello, world!</h2>
+```
 
 Because subsequent exports of the same Org file produce different IDs, there's no way to bookmark a headline. Instead, it'd be useful to have stable IDs, based on the titles they're attached to. In the example above, that ID would be "hello-world".
 
@@ -30,8 +32,10 @@ To check if everything is hooked up correctly, we'll define `org-html-stable-ids
 
 As expected, the result used "hello-world" as the ID for all headlines:
 
-    <h2 id="hello-world">Hello, world!</h2>
-    <h2 id="hello-world">Another headline!</h2>
+```html
+<h2 id="hello-world">Hello, world!</h2>
+<h2 id="hello-world">Another headline!</h2>
+```
 
 To have the IDs match each separate headline's contents, take the headline from the `datum` parmeter with `org-element-property`:
 
@@ -50,8 +54,10 @@ To have the IDs match each separate headline's contents, take the headline from 
 
 Now, all headlines in the file get assigned IDs that match their contents:
 
-    <h2 id="hello-world">Hello, world!</h2>
-    <h2 id="another-headline">Another headline!</h2>
+```html
+<h2 id="hello-world">Hello, world!</h2>
+<h2 id="another-headline">Another headline!</h2>
+```
 
 If a headline has a `CUSTOM_ID`, that's used instead of the generated one:
 
@@ -63,8 +69,10 @@ If a headline has a `CUSTOM_ID`, that's used instead of the generated one:
 :END:
 ```
 
-    <h2 id="hello-world">Hello, world!</h2>
-    <h2 id="custom-id">Another headline!</h2>
+```html
+<h2 id="hello-world">Hello, world!</h2>
+<h2 id="custom-id">Another headline!</h2>
+```
 
 In the current implementation, multiple headlines with the same contents get assigned the same ID. Instead of making the headlines custom by adding numbers to the end, the exporter should raise an error and quit. It's up to the author to update the document by giving the headlines meaningful custom IDs.
 
@@ -104,8 +112,10 @@ In another scenario, one headline has a custom ID that matches a previously reso
 :END:
 ```
 
-    <h2 id="hello-world">Hello, world!</h2>
-    <h2 id="hello-world">Another headline!</h2>
+```html
+<h2 id="hello-world">Hello, world!</h2>
+<h2 id="hello-world">Another headline!</h2>
+```
 
 This is caused by a function named `org-html--reference`, which circumvents `org-export-get-reference` when custom IDs are set. To ensure all IDs are checked against the internal references list, we override `org-html--reference` to call `org-export-get-reference` directly:<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
 
@@ -197,7 +207,9 @@ Call `org-html-stable-ids-add` before publishing a file:
 
 Get stable IDs:
 
-    <h2 id="hello-world">Hello, world!</h2>
+```html
+<h2 id="hello-world">Hello, world!</h2>
+```
 
 ## Footnotes
 
