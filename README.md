@@ -23,21 +23,7 @@ We'll write an advise to override the implementation of the `org-export-get-refe
   (advice-remove #'org-export-get-reference #'org-html-stable-ids--get-reference))
 ```
 
-To check if everything is hooked up correctly, we'll define `org-html-stable-ids--get-reference` that ignores the inputs and returns a static result:
-
-```emacs-lisp
-(defun org-html-stable-ids--get-reference (datum info)
-  "hello-world")
-```
-
-As expected, the result used "hello-world" as the ID for all headlines:
-
-```html
-<h2 id="hello-world">Hello, world!</h2>
-<h2 id="hello-world">Another headline!</h2>
-```
-
-To have the IDs match each separate headline's contents, take the headline from the `datum` parmeter with `org-element-property`:
+We'll define `org-html-stable-ids--get-reference` to return each headline's raw value, taken from the `datum` variable with `org-element-property`:
 
 ```emacs-lisp
 (defun org-html-stable-ids--to-kebab-case (string)
