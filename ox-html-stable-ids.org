@@ -70,49 +70,7 @@ To make the custom function easy to switch on and off, we'll write two helper fu
     (advice-remove #'org-export-get-reference #'org-html-stable-ids--get-reference))
 #+end_src
 
-To check if everything is hooked up correctly, we'll define =org-html-stable-ids--get-reference= that ignores the inputs and returns a static result:
-
-#+begin_src emacs-lisp
-  (defun org-html-stable-ids--get-reference (datum info)
-    "hello-world")
-#+end_src
-
-As expected, the result used "hello-world" as the ID for all headlines:
-
-#+headers: :exports none
-#+begin_src org :tangle test/fixtures/multiple-headlines-fail.org
-  ,* Hello, world!
-  ,* Another headline!
-#+end_src
-
-#+headers: :exports none
-#+begin_src emacs-lisp
-  (org-html-stable-ids-add)
-  (org-publish-file "test/fixtures/multiple-headlines-fail.org"
-                    '("ox-html-stable-ids"
-                      :publishing-function org-html-publish-to-html
-                      :base-directory "."
-                      :publishing-directory "."
-                      :section-numbers nil
-                      :with-toc nil))
-  (org-html-stable-ids-remove)
-#+end_src
-
-#+headers: :cache yes
-#+headers: :exports results
-#+headers: :results scalar
-#+headers: :wrap src html
-#+begin_src shell
-  cat test/fixtures/multiple-headlines-fail.html | grep "<h2 id="
-#+end_src
-
-#+RESULTS[87a8b0ff437e744a81bdfb6409f87f365e8f86c9]:
-#+begin_src html
-<h2 id="hello-world">Hello, world!</h2>
-<h2 id="hello-world">Another headline!</h2>
-#+end_src
-
-To have the IDs match each separate headline's contents, take the headline from the =datum= parmeter with =org-element-property=:
+We'll define ~org-html-stable-ids--get-reference~ to return each headline's raw value, taken from the ~datum~ variable with ~org-element-property~:
 
 #+headers: :exports none
 #+headers: :tangle test.el
