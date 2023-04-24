@@ -17,8 +17,6 @@
                       :with-toc nil))
 #+end_src
 
-#+RESULTS:
-
 When publishing HTML with Org mode's exporters, the headlines in the resulting documents get assigned ID attributes.
 These are used as anchors, amongst other things.
 By default, these are random, so a headline might get assigned ~org81963c6~ as its ID:
@@ -30,7 +28,7 @@ By default, these are random, so a headline might get assigned ~org81963c6~ as i
   cat test/fixtures/hello-world.html | grep "<h2 id="
 #+end_src
 
-#+RESULTS[bceb2028e92191632ebd6a8816fa0dfa61629e2e]:
+#+RESULTS[5601f74505af4a12954423fe57fd55e9e2f2d691]:
 : <h2 id="org81963c6">Hello, world!</h2>
 
 Because subsequent exports of the same Org file produce different IDs, there's no way to bookmark a headline.
@@ -69,9 +67,6 @@ To make the custom function easy to switch on and off, we'll write two helper fu
     (advice-remove #'org-export-get-reference #'org-html-stable-ids--get-reference))
 #+end_src
 
-#+RESULTS:
-: org-html-stable-ids-remove
-
 To check if everything is hooked up correctly, we'll define =org-html-stable-ids--get-reference= that ignores the inputs and returns a static result:
 
 #+begin_src emacs-lisp
@@ -100,8 +95,6 @@ As expected, the result used "hello-world" as the ID for all headlines:
   (org-html-stable-ids-remove)
 #+end_src
 
-#+RESULTS:
-
 #+headers: :cache yes
 #+headers: :exports results
 #+headers: :results scalar
@@ -109,7 +102,7 @@ As expected, the result used "hello-world" as the ID for all headlines:
   cat test/fixtures/multiple-headlines-fail.html | grep "<h2 id="
 #+end_src
 
-#+RESULTS[564a1f36688d42106a6f84efdae6067cf4bcbfd3]:
+#+RESULTS[c6fbcb79ab1518ee8b2b7affe28fb8b4a2668bae]:
 : <h2 id="hello-world">Hello, world!</h2>
 : <h2 id="hello-world">Another headline!</h2>
 
@@ -127,9 +120,6 @@ To have the IDs match each separate headline's contents, take the headline from 
       (should (string-match-p "<h2 id=\"another-headline" buffer)))
     (org-html-stable-ids-remove))
 #+end_src
-
-#+RESULTS:
-: multiple-headlines-test
 
 #+name: kebab-case
 #+headers: :exports none
@@ -150,9 +140,6 @@ To have the IDs match each separate headline's contents, take the headline from 
     (org-html-stable-ids--to-kebab-case
      (org-element-property :raw-value datum)))
 #+end_src
-
-#+RESULTS:
-: org-html-stable-ids--to-kebab-case
 
 Now, all headlines in the file get assigned IDs that match their contents:
 
@@ -175,8 +162,6 @@ Now, all headlines in the file get assigned IDs that match their contents:
   (org-html-stable-ids-remove)
 #+end_src
 
-#+RESULTS:
-
 #+headers: :cache yes
 #+headers: :exports results
 #+headers: :results scalar
@@ -184,7 +169,7 @@ Now, all headlines in the file get assigned IDs that match their contents:
   cat test/fixtures/multiple-headlines.html | grep "<h2 id="
 #+end_src
 
-#+RESULTS[7ca8f72e3c8cf16f3aeb35f5f6e42e8d2c705f5f]:
+#+RESULTS[acf3e5324f4dccff4208e99037ac727ee4cc7d00]:
 : <h2 id="hello-world">Hello, world!</h2>
 : <h2 id="another-headline">Another headline!</h2>
 
@@ -211,8 +196,6 @@ If a headline has a ~CUSTOM_ID~, that's used instead of the generated one:
   (org-html-stable-ids-remove)
 #+end_src
 
-#+RESULTS:
-
 #+headers: :cache yes
 #+headers: :exports results
 #+headers: :results scalar
@@ -220,7 +203,7 @@ If a headline has a ~CUSTOM_ID~, that's used instead of the generated one:
   cat test/fixtures/cutom-id.html | grep "<h2 id="
 #+end_src
 
-#+RESULTS[822b32d5e73e239d9f625fd73b224b0dab021a65]:
+#+RESULTS[276556cc9ce0461fc3f05c1b3189bd2d8a922925]:
 : <h2 id="hello-world">Hello, world!</h2>
 : <h2 id="custom-id">Another headline!</h2>
 
@@ -247,9 +230,6 @@ However, if it's called with new element which resolves to an ID that's already 
               (plist-put info :internal-references cache)
               id)))))
 #+end_src
-
-#+RESULTS:
-: org-html-stable-ids--get-reference
 
 Now, the function raises an error when two headlines resolve to the same ID:
 
@@ -284,9 +264,6 @@ Now, the function raises an error when two headlines resolve to the same ID:
     (org-html-stable-ids-remove))
 #+end_src
 
-#+RESULTS:
-: duplicate-headlines-test
-
 #+headers: :exports none
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
@@ -299,8 +276,6 @@ Now, the function raises an error when two headlines resolve to the same ID:
                       :with-toc nil))
   (org-html-stable-ids-remove)
 #+end_src
-
-#+RESULTS:
 
 #+begin_example
 Duplicate ID: hello-world
@@ -328,9 +303,6 @@ Currently, it doesn't:
     (org-html-stable-ids-remove))
 #+end_src
 
-#+RESULTS:
-: duplicate-headlines-with-custom-id-test
-
 #+headers: :exports none
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
@@ -344,8 +316,6 @@ Currently, it doesn't:
   (org-html-stable-ids-remove)
 #+end_src
 
-#+RESULTS:
-
 #+headers: :cache yes
 #+headers: :exports results
 #+headers: :results scalar
@@ -353,7 +323,7 @@ Currently, it doesn't:
   cat test/fixtures/duplicate-headlines-with-custom-id.html | grep "<h2 id="
 #+end_src
 
-#+RESULTS[b9d6b8f9bd4da8321100bc141f378bb1ad953b3f]:
+#+RESULTS[7fa89d5de28b6d8bb2a75e36c97c5b96fbea9d64]:
 : <h2 id="hello-world">Hello, world!</h2>
 : <h2 id="hello-world">Another headline!</h2>
 
@@ -379,9 +349,6 @@ By calling out to =org-export-get-reference= directly, that functionality is los
     (advice-remove #'org-html--reference #'org-html-stable-ids--reference))
 #+end_src
 
-#+RESULTS:
-: org-html-stable-ids-remove
-
 #+name: org-html-reference
 #+begin_src emacs-lisp
   (defun org-html-stable-ids--reference (datum info &optional named-only)
@@ -391,9 +358,6 @@ By calling out to =org-export-get-reference= directly, that functionality is los
     (unless named-only
       (org-export-get-reference datum info)))
 #+end_src
-
-#+RESULTS: org-html-reference
-: org-html-stable-ids--reference
 
 Then, in our overridden version, we check if a custom ID is set before generating an ID from the element's value:
 
@@ -426,9 +390,6 @@ Then, in our overridden version, we check if a custom ID is set before generatin
 	      id)))))
 #+end_src
 
-#+RESULTS: org-reference
-: org-html-stable-ids--get-reference
-
 #+headers: :exports none
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
@@ -441,8 +402,6 @@ Then, in our overridden version, we check if a custom ID is set before generatin
                       :with-toc nil))
   (org-html-stable-ids-remove)
 #+end_src
-
-#+RESULTS:
 
 Publishing the example again produces the expected error:
 
@@ -509,8 +468,6 @@ Call =org-html-stable-ids-add= before publishing a file:
   (org-html-stable-ids-remove)
 #+end_src
 
-#+RESULTS:
-
 Get stable IDs:
 
 #+headers: :cache yes
@@ -520,5 +477,5 @@ Get stable IDs:
   cat test/fixtures/hello-world.html | grep "<h2 id="
 #+end_src
 
-#+RESULTS[bceb2028e92191632ebd6a8816fa0dfa61629e2e]:
+#+RESULTS[5601f74505af4a12954423fe57fd55e9e2f2d691]:
 : <h2 id="hello-world">Hello, world!</h2>
