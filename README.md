@@ -1,5 +1,5 @@
 
-# ox-html-stable-ids
+# ox-html-stable-ids.el: Stable IDs for ox-html.el
 
 When publishing HTML with Org mode's exporters, the headlines in the resulting documents get assigned ID attributes. These are used as anchors, amongst other things. By default, these are random, so a headline might get assigned `org81963c6` as its ID:
 
@@ -9,7 +9,7 @@ When publishing HTML with Org mode's exporters, the headlines in the resulting d
 
 Because subsequent exports of the same Org file produce different IDs, there's no way to bookmark a headline. Instead, it'd be useful to have stable IDs, based on the titles they're attached to. In the example above, that ID would be "hello-world".
 
-The function responsible for exporting headlines to HTML&#x2014;named `org-html-headline`&#x2014;calls `org-export-get-reference` to get a unique reference to the headline. By overriding the latter, we can get the exporter to assign custom IDs to the document's headlines.
+The function responsible for exporting headlines to HTML&#x2014;named `org-html-headline`&#x2014;calls `org-export-get-reference` to get a unique reference to the headline. By overriding the latter, we can get the exporter to assign custom IDs to the document's headlines.<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
 
 We'll write an advise to override the implementation of the `org-export-get-reference` function. To make the custom function easy to switch on and off, we'll write two helper functions:
 
@@ -103,7 +103,7 @@ In another scenario, one headline has a custom ID that matches a previously reso
 <h2 id="hello-world">Another headline!</h2>
 ```
 
-This is caused by a function named `org-html--reference`, which circumvents `org-export-get-reference` when custom IDs are set. To ensure all IDs are checked against the internal references list, we override `org-html--reference` to call `org-export-get-reference` directly:<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
+This is caused by a function named `org-html--reference`, which circumvents `org-export-get-reference` when custom IDs are set. To ensure all IDs are checked against the internal references list, we override `org-html--reference` to call `org-export-get-reference` directly:<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>
 
 ```emacs-lisp
 (defun org-html-stable-ids-add ()
@@ -199,4 +199,8 @@ Get stable IDs:
 
 ## Footnotes
 
-<sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> : The `org-html--reference` function has added logic to check the *html-prefer-user-labels* attribute. By calling out to `org-export-get-reference` directly, that functionality is lost, meaning this library implies the *html-prefer-user-labels* setting.
+<sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> This is based on [Adam Porter's useful anchors example](https://github.com/alphapapa/unpackaged.el#export-to-html-with-useful-anchors), which differs in a couple of ways:
+
+Adam's example uses URL encoded IDs, instead of stripping all non-alphabetic and non-numeric characters and converting it to kebab-case. For non-unique IDs, it prepends the ancestors' IDs and appends numbers until each ID is unique instead of raising an error and forcing the user to use custom IDs. It's the better choice if you need stable IDs that sort themselves out and won't break your publishing.
+
+<sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> : The `org-html--reference` function has added logic to check the *html-prefer-user-labels* attribute. By calling out to `org-export-get-reference` directly, that functionality is lost, meaning this library implies the *html-prefer-user-labels* setting.
