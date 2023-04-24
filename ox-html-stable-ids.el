@@ -36,26 +36,35 @@
 
 (defun org-html-stable-ids--reference (datum info &optional named-only)
   "Call `org-export-get-reference` to get a reference for DATUM with INFO.
-The NAMED-ONLY argument is ignored, as `org-export-get-reference`
-always returns a reference."
-  (org-export-get-reference datum info))
+
+If `NAMED-ONLY` is non-nil, return nil."
+  (unless named-only
+    (org-export-get-reference datum info)))
+
+(defun org-html-stable-ids--extract-id (datum)
+  "Extract a reference from a DATUM.
+
+Return DATUM's `:CUSTOM_ID` if set, or generate a reference from its
+`:raw-value` property.  If the DATUM does not have either, return
+nil."
+  (or
+   (org-element-property :CUSTOM_ID datum)
+   (let ((value (org-element-property :raw-value datum)))
+     (when value
+       (org-html-stable-ids--to-kebab-case value)))))
 
 (defun org-html-stable-ids--get-reference (datum info)
   "Return a reference for DATUM with INFO.
 
-Return the element's :CUSTOM_ID, or an id generated from its
-`:raw-value` property.  Raise an error if the ID was used in the
-document before."
-  (let ((cache (plist-get info :internal-references)))
-    (let ((id (or
-               (org-element-property :CUSTOM_ID datum)
-               (org-html-stable-ids--to-kebab-case
-                (org-element-property :raw-value datum)))))
-      (or (rassq datum cache)
-          (if (assoc id cache)
-              (user-error "Duplicate ID: %s" id)
-            (push (cons id datum) cache)
-            (plist-put info :internal-references cache)
-            id)))))
+Raise an error if the ID was used in the document before."
+  (let ((cache (plist-get info :internal-references))
+	(id (org-html-stable-ids--extract-id datum)))
+    (or (car (rassq datum cache))
+	(if (assoc id cache)
+	    (user-error "Duplicate ID: %s" id)
+	  (when id
+	    (push (cons id datum) cache)
+	    (plist-put info :internal-references cache)
+	    id)))))
 
 ;;; ox-html-stable-ids.el ends here
