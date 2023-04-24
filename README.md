@@ -123,8 +123,6 @@ This is caused by a function named `org-html--reference`, which circumvents `org
   (advice-remove #'org-html--reference #'org-html-stable-ids--reference))
 ```
 
-    org-html-stable-ids-remove
-
 ```emacs-lisp
 (defun org-html-stable-ids--reference (datum info &optional named-only)
   "Call `org-export-get-reference` to get a reference for DATUM with INFO.
