@@ -505,13 +505,15 @@ Duplicate ID: hello-world
 
   (require 'ox)
 
+  <<extract-id>>
+
   <<kebab-case>>
 
-  <<add-remove>>
+  <<org-reference>>
 
   <<org-html-reference>>
 
-  <<org-reference>>
+  <<add-remove>>
 
   ;;; ox-html-stable-ids.el ends here
 #+end_src

@@ -15,33 +15,6 @@
 
 (require 'ox)
 
-(defun org-html-stable-ids--to-kebab-case (string)
-  "Convert STRING to kebab-case."
-  (string-trim
-   (replace-regexp-in-string
-    "[^a-z0-9]+" "-"
-    (downcase string))
-   "-" "-"))
-
-(defun org-html-stable-ids-add ()
-  "Enable org-html-stable-ids."
-  (interactive)
-  (advice-add #'org-export-get-reference :override #'org-html-stable-ids--get-reference)
-  (advice-add #'org-html--reference :override #'org-html-stable-ids--reference))
-
-(defun org-html-stable-ids-remove ()
-  "Disable org-html-stable-ids."
-  (interactive)
-  (advice-remove #'org-export-get-reference #'org-html-stable-ids--get-reference)
-  (advice-remove #'org-html--reference #'org-html-stable-ids--reference))
-
-(defun org-html-stable-ids--reference (datum info &optional named-only)
-  "Call `org-export-get-reference` to get a reference for DATUM with INFO.
-
-If `NAMED-ONLY` is non-nil, return nil."
-  (unless named-only
-    (org-export-get-reference datum info)))
-
 (defun org-html-stable-ids--extract-id (datum)
   "Extract a reference from a DATUM.
 
@@ -53,6 +26,14 @@ nil."
    (let ((value (org-element-property :raw-value datum)))
      (when value
        (org-html-stable-ids--to-kebab-case value)))))
+
+(defun org-html-stable-ids--to-kebab-case (string)
+  "Convert STRING to kebab-case."
+  (string-trim
+   (replace-regexp-in-string
+    "[^a-z0-9]+" "-"
+    (downcase string))
+   "-" "-"))
 
 (defun org-html-stable-ids--get-reference (datum info)
   "Return a reference for DATUM with INFO.
@@ -67,5 +48,24 @@ Raise an error if the ID was used in the document before."
 	    (push (cons id datum) cache)
 	    (plist-put info :internal-references cache)
 	    id)))))
+
+(defun org-html-stable-ids--reference (datum info &optional named-only)
+  "Call `org-export-get-reference` to get a reference for DATUM with INFO.
+
+If `NAMED-ONLY` is non-nil, return nil."
+  (unless named-only
+    (org-export-get-reference datum info)))
+
+(defun org-html-stable-ids-add ()
+  "Enable org-html-stable-ids."
+  (interactive)
+  (advice-add #'org-export-get-reference :override #'org-html-stable-ids--get-reference)
+  (advice-add #'org-html--reference :override #'org-html-stable-ids--reference))
+
+(defun org-html-stable-ids-remove ()
+  "Disable org-html-stable-ids."
+  (interactive)
+  (advice-remove #'org-export-get-reference #'org-html-stable-ids--get-reference)
+  (advice-remove #'org-html--reference #'org-html-stable-ids--reference))
 
 ;;; ox-html-stable-ids.el ends here
