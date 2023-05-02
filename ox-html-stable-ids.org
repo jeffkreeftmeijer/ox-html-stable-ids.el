@@ -62,13 +62,6 @@ In the example above, that ID would be "hello-world".
 The function responsible for exporting headlines to HTML---named =org-html-headline=---calls =org-export-get-reference= to get a unique reference to the headline.
 By overriding the latter, we can get the exporter to assign custom IDs to the document's headlines.[fn:adam-porter]
 
-[fn:adam-porter] This is based on [[https://github.com/alphapapa/unpackaged.el#export-to-html-with-useful-anchors][Adam Porter's useful anchors example]], which differs in a couple of ways:
-
-Adam's example uses URL encoded IDs, instead of stripping all non-alphabetic and non-numeric characters and converting it to kebab-case.
-For non-unique IDs, it prepends the ancestors' IDs and appends numbers until each ID is unique instead of raising an error and forcing the user to use custom IDs.
-It's the better choice if you need stable IDs that sort themselves out and won't break your publishing.
-
-
 We'll write an advise to override the implementation of the =org-export-get-reference= function.
 To make the custom function easy to switch on and off, we'll write two helper functions:
 
@@ -315,10 +308,6 @@ Currently, it doesn't:
 This is caused by a function named =org-html--reference=, which circumvents =org-export-get-reference= when custom IDs are set.
 To ensure all IDs are checked against the internal references list, we override =org-html--reference= to call =org-export-get-reference= directly:[fn:override]
 
-[fn:override]: The =org-html--reference= function has added logic to check the /html-prefer-user-labels/ attribute.
-By calling out to =org-export-get-reference= directly, that functionality is lost, meaning this library implies the /html-prefer-user-labels/ setting.
-
-
 #+name: add-remove
 #+begin_src emacs-lisp
   (defun org-html-stable-ids-add ()
@@ -467,3 +456,13 @@ Get stable IDs:
 #+begin_src html
 <h2 id="hello-world">Hello, world!</h2>
 #+end_src
+
+[fn:override]: The =org-html--reference= function has added logic to check the /html-prefer-user-labels/ attribute.
+By calling out to =org-export-get-reference= directly, that functionality is lost, meaning this library implies the /html-prefer-user-labels/ setting.
+
+[fn:adam-porter] This is based on [[https://github.com/alphapapa/unpackaged.el#export-to-html-with-useful-anchors][Adam Porter's useful anchors example]], which differs in a couple of ways:
+
+Adam's example uses URL encoded IDs, instead of stripping all non-alphabetic and non-numeric characters and converting it to kebab-case.
+For non-unique IDs, it prepends the ancestors' IDs and appends numbers until each ID is unique instead of raising an error and forcing the user to use custom IDs.
+It's the better choice if you need stable IDs that sort themselves out and won't break your publishing.
+
