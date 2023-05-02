@@ -3,7 +3,7 @@
 :END:
 #+title: ox-html-stable-ids.el: Stable IDs for ox-html.el
 #+author: Jeff Kreeftmeijer
-#+date: 2023-03-31
+#+date: 2023-05-03
 #+options: toc:nil
 
 [[https://github.com/jeffkreeftmeijer/ox-html-stable-ids.el][Ox-html-stable-ids]] is an Org export extension package that generates HTML with stable ID attributes instead of the random IDs Org's exporter uses by default.
