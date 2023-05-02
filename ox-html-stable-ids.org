@@ -49,6 +49,26 @@ In the example above, the headline's ID would be "hello-world".
 
 * Implementation
 
+Ox-html-stable-ids is disabled by default, even after requiring and enabling the library.
+It only replaces IDs in exported HTML documents when ~org-html-stable-ids~ is non-nil:
+
+#+name: options
+#+begin_src emacs-lisp
+(defgroup org-export-html-stable-ids nil
+  "Options for org-html-stable-ids."
+  :tag "Org Markdown Title"
+  :group 'org-export
+  :version "24.4"
+  :package-version '(Org . "8.0"))
+
+(defcustom org-html-stable-ids nil
+  "Non-nil means to use stable IDs in the exported document."
+  :group 'org-export-html-stable-ids
+  :version "24.4"
+  :package-version '(Org . "8.0")
+  :type 'boolean)
+#+end_src
+
 The function that generates headlines in Org's HTML exporer (~org-html-headline~) calls a function called ~org-export-get-reference~ to generate a unique reference for the headline.
 Ox-html-stable-ids adds an advice to overrides that function to return stable IDs, based on the headline's contents, instead.[fn:adam-porter]
 
@@ -288,6 +308,8 @@ Duplicate ID: hello-world
   ;;; Code:
 
   (require 'ox)
+
+  <<options>>
 
   <<extract-id>>
 

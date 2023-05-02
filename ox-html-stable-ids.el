@@ -15,6 +15,20 @@
 
 (require 'ox)
 
+(defgroup org-export-html-stable-ids nil
+  "Options for org-html-stable-ids."
+  :tag "Org Markdown Title"
+  :group 'org-export
+  :version "24.4"
+  :package-version '(Org . "8.0"))
+
+(defcustom org-html-stable-ids nil
+  "Non-nil means to use stable IDs in the exported document."
+  :group 'org-export-html-stable-ids
+  :version "24.4"
+  :package-version '(Org . "8.0")
+  :type 'boolean)
+
 (defun org-html-stable-ids--extract-id (datum)
   "Extract a reference from a DATUM.
 
