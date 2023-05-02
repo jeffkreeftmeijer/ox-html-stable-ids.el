@@ -18,8 +18,9 @@
 (defun org-html-stable-ids--to-kebab-case (string)
   "Convert STRING to kebab-case."
   (string-trim
-   (replace-regexp-in-string "[^a-z0-9]+" "-"
-                             (downcase string))
+   (replace-regexp-in-string
+    "[^a-z0-9]+" "-"
+    (downcase string))
    "-" "-"))
 
 (defun org-html-stable-ids-add ()

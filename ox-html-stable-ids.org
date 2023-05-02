@@ -43,9 +43,106 @@ By default, these are random, so a headline might get assigned ~org81963c6~ as i
 <h2 id="org81963c6">Hello, world!</h2>
 #+end_src
 
-Because subsequent exports of the same Org file produce different IDs, there's no way to bookmark a headline.
-Instead, it'd be useful to have stable IDs, based on the titles they're attached to.
-In the example above, that ID would be "hello-world".
+Because subsequent exports of the same Org file produce different IDs, there's no way to link to a headline from an external page.
+Ox-html-stable-ids provides stable IDs based on the titles of the headlines they're attached to.
+In the example above, the headline's ID would be "hello-world".
+
+* Implementation
+
+The function that generates headlines in Org's HTML exporer (~org-html-headline~) calls a function called ~org-export-get-reference~ to generate a unique reference for the headline.
+Ox-html-stable-ids adds an advice to overrides that function to return stable IDs, based on the headline's contents, instead.[fn:adam-porter]
+
+First, the ~org-html-stable-ids--extract-id~ helper function takes a headline and returns a stable ID:
+
+#+name: extract-id
+#+begin_src emacs-lisp
+  (defun org-html-stable-ids--extract-id (datum)
+    "Extract a reference from a DATUM.
+
+  Return DATUM's `:CUSTOM_ID` if set, or generate a reference from its
+  `:raw-value` property.  If the DATUM does not have either, return
+  nil."
+    (or
+     (org-element-property :CUSTOM_ID datum)
+     (let ((value (org-element-property :raw-value datum)))
+       (when value
+	 (org-html-stable-ids--to-kebab-case value)))))
+#+end_src
+
+If the headline has a ~:CUSTOM_ID~ property, that's immediately returned.
+If not, the ID is created by taking the headline's contents and converting them to "kebab case".
+
+#+begin_aside
+
+The illustratively named /kebab case/ is a case style (like =snake_case= or =camelCase=) where all characters are lower case, and all whitespace is replaced by dashes resembling a kebab.
+It's used in Lisp-style languages, and URL fragments.
+
+An implementation in Emacs Lisp uses a regular expression to replace everything but letters and numbers to a dash, and then downcases the result:
+
+#+name: kebab-case
+#+begin_src emacs-lisp
+  (defun org-html-stable-ids--to-kebab-case (string)
+    "Convert STRING to kebab-case."
+    (string-trim
+     (replace-regexp-in-string
+      "[^a-z0-9]+" "-"
+      (downcase string))
+     "-" "-"))
+#+end_src
+
+#+end_aside
+
+The ~org-export-get-reference~ is overridden by a function named ~org-html-stable-ids--get-reference~, which calls the ~org-html-stable-ids--extract-id~ to extract IDs for headlines.
+It uses an internal propetry list named ~:internal-references~ as a cache to store generated IDs in.
+If a generated ID matches one that's already in the cache, an error is returned, and the export is aborted:
+
+#+name: org-reference
+#+begin_src emacs-lisp
+  (defun org-html-stable-ids--get-reference (datum info)
+    "Return a reference for DATUM with INFO.
+
+  Raise an error if the ID was used in the document before."
+    (let ((cache (plist-get info :internal-references))
+	  (id (org-html-stable-ids--extract-id datum)))
+      (or (car (rassq datum cache))
+	  (if (assoc id cache)
+	      (user-error "Duplicate ID: %s" id)
+	    (when id
+	      (push (cons id datum) cache)
+	      (plist-put info :internal-references cache)
+	      id)))))
+#+end_src
+
+Org's HTML exporter doesn't call the ~org-export-get-reference~ function directly, but has an internal function named ~org-html--reference~ that's called whenever a reference is needed.
+To ensure all ids are checked against the internal references list, this package overrides =org-html--reference= to always call ~org-export-get-reference~ directly:[fn:override]
+
+#+name: org-html-reference
+#+begin_src emacs-lisp
+  (defun org-html-stable-ids--reference (datum info &optional named-only)
+    "Call `org-export-get-reference` to get a reference for DATUM with INFO.
+
+  If `NAMED-ONLY` is non-nil, return nil."
+    (unless named-only
+      (org-export-get-reference datum info)))
+#+end_src
+
+Finally, the advise is added (and possibly removed) through the ~org-html-stable-ids-add~ and ~org-html-stable-ids-remove~ functions:
+
+#+name: add-remove
+#+begin_src emacs-lisp
+  (defun org-html-stable-ids-add ()
+    "Enable org-html-stable-ids."
+    (interactive)
+    (advice-add #'org-export-get-reference :override #'org-html-stable-ids--get-reference)
+    (advice-add #'org-html--reference :override #'org-html-stable-ids--reference))
+
+  (defun org-html-stable-ids-remove ()
+    "Disable org-html-stable-ids."
+    (interactive)
+    (advice-remove #'org-export-get-reference #'org-html-stable-ids--get-reference)
+    (advice-remove #'org-html--reference #'org-html-stable-ids--reference))
+#+end_src
+
 
 #+headers: :exports none
 #+headers: :tangle test.el
