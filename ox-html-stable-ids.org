@@ -326,17 +326,18 @@ Duplicate ID: hello-world
   ;;; ox-html-stable-ids.el ends here
 #+end_src
 
-
 * Usage
 
-Install ox-html-stable-ids with straight and use-package:
+Ox-html-stable-ids is currently not available through any of the package registries.
+Instead, install it from the repository direcly.
+Install the package with [use-package](https://github.com/jwiegley/use-package) and [straight.el](https://github.com/radian-software/straight.el), and enable it by calling ~org-html-stable-ids-add~:
 
 #+begin_src emacs-lisp
-(use-package ox-html-stable-ids
-  :straight '(ox-html-stable-ids
-              :type git
-              :host github
-              :repo "jeffkreeftmeijer/ox-html-stable-ids.el"))
+  (use-package ox-md-title
+    :straight
+    (ox-md-title :type git :host github :repo "jeffkreeftmeijer/ox-html-stable-ids.el")
+    :config
+    (org-html-stable-ids-add))
 #+end_src
 
 After calling ~org-html-stable-ids-add~, set the ~org-html-stable-ids~ variable to to enable the package while exporting:
