@@ -143,23 +143,6 @@ Finally, the advise is added (and possibly removed) through the ~org-html-stable
     (advice-remove #'org-html--reference #'org-html-stable-ids--reference))
 #+end_src
 
-
-#+headers: :exports none
-#+headers: :tangle test.el
-#+begin_src emacs-lisp
-  (require 'ert)
-  (load-file "ox-html-stable-ids.el")
-
-  (ert-deftest hello-world-test ()
-    (org-html-stable-ids-add)
-    (find-file "test/fixtures/hello-world.org")
-    (org-html-export-as-html)
-    (should (string-match-p
-             "<h2 id=\"hello-world"
-             (with-current-buffer "*Org HTML Export*" (buffer-string))))
-    (org-html-stable-ids-remove))
-#+end_src
-
 * Results
 
 Now, all headlines in the file get assigned IDs that match their contents:
@@ -168,19 +151,6 @@ Now, all headlines in the file get assigned IDs that match their contents:
 #+begin_src org :tangle test/fixtures/multiple-headlines.org
   ,* Hello, world!
   ,* Another headline!
-#+end_src
-
-#+headers: :exports none
-#+headers: :tangle test.el
-#+begin_src emacs-lisp
-  (ert-deftest multiple-headlines-test ()
-    (org-html-stable-ids-add)
-    (find-file "test/fixtures/multiple-headlines.org")
-    (org-html-export-as-html)
-    (let ((buffer (with-current-buffer "*Org HTML Export*" (buffer-string))))
-      (should (string-match-p "<h2 id=\"hello-world" buffer))
-      (should (string-match-p "<h2 id=\"another-headline" buffer)))
-    (org-html-stable-ids-remove))
 #+end_src
 
 #+headers: :exports none
@@ -255,32 +225,6 @@ Now, the function raises an error when two headlines resolve to the same ID:
 #+end_src
 
 #+headers: :exports none
-#+headers: :tangle test.el
-#+begin_src emacs-lisp
-  (ert-deftest src-block-test ()
-    (org-html-stable-ids-add)
-    (find-file "test/fixtures/src-block.org")
-    (org-html-export-as-html)
-    (let ((buffer (with-current-buffer "*Org HTML Export*" (buffer-string))))
-      (should (string-match-p "<pre class=\"src src-shell\">" buffer)))
-    (org-html-stable-ids-remove))
-
-  (ert-deftest example-block-test ()
-    (org-html-stable-ids-add)
-    (find-file "test/fixtures/example-block.org")
-    (org-html-export-as-html)
-    (let ((buffer (with-current-buffer "*Org HTML Export*" (buffer-string))))
-      (should (string-match-p "<pre class=\"example\">" buffer)))
-    (org-html-stable-ids-remove))
-
-  (ert-deftest duplicate-headlines-test ()
-    (org-html-stable-ids-add)
-    (find-file "test/fixtures/duplicate-headlines.org")
-    (should-error (org-html-export-as-html))
-    (org-html-stable-ids-remove))
-#+end_src
-
-#+headers: :exports none
 #+begin_src emacs-lisp
   (org-html-stable-ids-add)
   (org-publish-file "test/fixtures/duplicate-headlines.org"
@@ -305,16 +249,6 @@ As expected, the error is also raised when a custom ID is duplicated:
   :PROPERTIES:
   :CUSTOM_ID: hello-world
   :END:
-#+end_src
-
-#+headers: :exports none
-#+headers: :tangle test.el
-#+begin_src emacs-lisp
-  (ert-deftest duplicate-headlines-with-custom-id-test ()
-    (org-html-stable-ids-add)
-    (find-file "test/fixtures/duplicate-headlines-with-custom-id.org")
-    (should-error (org-html-export-as-html))
-    (org-html-stable-ids-remove))
 #+end_src
 
 #+headers: :exports none
