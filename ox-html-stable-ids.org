@@ -160,23 +160,15 @@ Finally, the advise is added (and possibly removed) through the ~org-html-stable
     (org-html-stable-ids-remove))
 #+end_src
 
-The function responsible for exporting headlines to HTML---named =org-html-headline=---calls =org-export-get-reference= to get a unique reference to the headline.
-By overriding the latter, we can get the exporter to assign custom IDs to the document's headlines.[fn:adam-porter]
+* Results
 
-We'll write an advise to override the implementation of the =org-export-get-reference= function.
-To make the custom function easy to switch on and off, we'll write two helper functions:
+Now, all headlines in the file get assigned IDs that match their contents:
 
-#+begin_src emacs-lisp
-  (defun org-html-stable-ids-add ()
-    (interactive)
-    (advice-add #'org-export-get-reference :override #'org-html-stable-ids--get-reference))
-
-  (defun org-html-stable-ids-remove ()
-    (interactive)
-    (advice-remove #'org-export-get-reference #'org-html-stable-ids--get-reference))
+#+headers: :exports none
+#+begin_src org :tangle test/fixtures/multiple-headlines.org
+  ,* Hello, world!
+  ,* Another headline!
 #+end_src
-
-We'll define ~org-html-stable-ids--get-reference~ to return each headline's raw value, taken from the ~datum~ variable with ~org-element-property~:
 
 #+headers: :exports none
 #+headers: :tangle test.el
@@ -189,34 +181,6 @@ We'll define ~org-html-stable-ids--get-reference~ to return each headline's raw 
       (should (string-match-p "<h2 id=\"hello-world" buffer))
       (should (string-match-p "<h2 id=\"another-headline" buffer)))
     (org-html-stable-ids-remove))
-#+end_src
-
-#+name: kebab-case
-#+headers: :exports none
-#+begin_src emacs-lisp
-  (defun org-html-stable-ids--to-kebab-case (string)
-    "Convert STRING to kebab-case."
-    (string-trim
-     (replace-regexp-in-string "[^a-z0-9]+" "-"
-                               (downcase string))
-     "-" "-"))
-#+end_src
-
-#+headers: :noweb yes
-#+begin_src emacs-lisp
-  <<kebab-case>>
-
-  (defun org-html-stable-ids--get-reference (datum info)
-    (org-html-stable-ids--to-kebab-case
-     (org-element-property :raw-value datum)))
-#+end_src
-
-Now, all headlines in the file get assigned IDs that match their contents:
-
-#+headers: :exports none
-#+begin_src org :tangle test/fixtures/multiple-headlines.org
-  ,* Hello, world!
-  ,* Another headline!
 #+end_src
 
 #+headers: :exports none
@@ -283,30 +247,6 @@ If a headline has a ~CUSTOM_ID~, that's used instead of the generated one:
 <h2 id="custom-id">Another headline!</h2>
 #+end_src
 
-In the current implementation, multiple headlines with the same contents get assigned the same ID.
-Instead of making the headlines custom by adding numbers to the end, the exporter should raise an error and quit.
-It's up to the author to update the document by giving the headlines meaningful custom IDs.
-
-Exporting a document with duplicate IDs should raise an error.
-To do so, each ID needs to be added to a cache when it's created, much like the original implementation of =org-get-reference=.
-Whenever an ID is requested, an /internal-references/ key is added to the /info/ property list if it doesn't exist yet.
-It holds a cons with the ID and the element.
-If the function is called again with the same element, the ID is taken from the property list and returned.
-However, if it's called with new element which resolves to an ID that's already in the property list, the function retuns an error:
-
-#+begin_src emacs-lisp
-  (defun org-html-stable-ids--get-reference (datum info)
-    (let ((cache (plist-get info :internal-references)))
-      (let ((id (org-html-stable-ids--to-kebab-case
-                 (org-element-property :raw-value datum))))
-        (or (car (rassq datum cache))
-            (if (assoc id cache)
-                (user-error "Duplicate ID: %s" id)
-              (push (cons id datum) cache)
-              (plist-put info :internal-references cache)
-              id)))))
-#+end_src
-
 Now, the function raises an error when two headlines resolve to the same ID:
 
 #+begin_src org :tangle test/fixtures/duplicate-headlines.org
@@ -357,9 +297,7 @@ Now, the function raises an error when two headlines resolve to the same ID:
 Duplicate ID: hello-world
 #+end_example
 
-In another scenario, one headline has a custom ID that matches a previously resolved ID.
-Because this yields duplicate IDs, this should also raise an error.
-Currently, it doesn't:
+As expected, the error is also raised when a custom ID is duplicated:
 
 #+begin_src org :tangle test/fixtures/duplicate-headlines-with-custom-id.org
   ,* Hello, world!
@@ -391,94 +329,6 @@ Currently, it doesn't:
                       :with-toc nil))
   (org-html-stable-ids-remove)
 #+end_src
-
-#+headers: :cache yes
-#+headers: :exports results
-#+headers: :results scalar
-#+headers: :wrap src html
-#+begin_src shell
-  cat test/fixtures/duplicate-headlines-with-custom-id.html | grep "<h2 id="
-#+end_src
-
-#+RESULTS[89df73837d0fe1b6348ca55230c3213d3f48a687]:
-#+begin_src html
-<h2 id="hello-world">Hello, world!</h2>
-<h2 id="hello-world">Another headline!</h2>
-#+end_src
-
-This is caused by a function named =org-html--reference=, which circumvents =org-export-get-reference= when custom IDs are set.
-To ensure all IDs are checked against the internal references list, we override =org-html--reference= to call =org-export-get-reference= directly:[fn:override]
-
-#+name: add-remove
-#+begin_src emacs-lisp
-  (defun org-html-stable-ids-add ()
-    "Enable org-html-stable-ids."
-    (interactive)
-    (advice-add #'org-export-get-reference :override #'org-html-stable-ids--get-reference)
-    (advice-add #'org-html--reference :override #'org-html-stable-ids--reference))
-
-  (defun org-html-stable-ids-remove ()
-    "Disable org-html-stable-ids."
-    (interactive)
-    (advice-remove #'org-export-get-reference #'org-html-stable-ids--get-reference)
-    (advice-remove #'org-html--reference #'org-html-stable-ids--reference))
-#+end_src
-
-#+name: org-html-reference
-#+begin_src emacs-lisp
-  (defun org-html-stable-ids--reference (datum info &optional named-only)
-    "Call `org-export-get-reference` to get a reference for DATUM with INFO.
-
-  If `NAMED-ONLY` is non-nil, return nil."
-    (unless named-only
-      (org-export-get-reference datum info)))
-#+end_src
-
-Then, in our overridden version, we check if a custom ID is set before generating an ID from the element's value:
-
-#+name: org-reference
-#+begin_src emacs-lisp
-  (defun org-html-stable-ids--extract-id (datum)
-    "Extract a reference from a DATUM.
-
-  Return DATUM's `:CUSTOM_ID` if set, or generate a reference from its
-  `:raw-value` property.  If the DATUM does not have either, return
-  nil."
-    (or
-     (org-element-property :CUSTOM_ID datum)
-     (let ((value (org-element-property :raw-value datum)))
-       (when value
-	 (org-html-stable-ids--to-kebab-case value)))))
-
-  (defun org-html-stable-ids--get-reference (datum info)
-    "Return a reference for DATUM with INFO.
-
-  Raise an error if the ID was used in the document before."
-    (let ((cache (plist-get info :internal-references))
-	  (id (org-html-stable-ids--extract-id datum)))
-      (or (car (rassq datum cache))
-	  (if (assoc id cache)
-	      (user-error "Duplicate ID: %s" id)
-	    (when id
-	      (push (cons id datum) cache)
-	      (plist-put info :internal-references cache)
-	      id)))))
-#+end_src
-
-#+headers: :exports none
-#+begin_src emacs-lisp
-  (org-html-stable-ids-add)
-  (org-publish-file "test/fixtures/duplicate-headlines-with-custom-id.org"
-                    '("ox-html-stable-ids"
-                      :publishing-function org-html-publish-to-html
-                      :base-directory "."
-                      :publishing-directory "."
-                      :section-numbers nil
-                      :with-toc nil))
-  (org-html-stable-ids-remove)
-#+end_src
-
-Publishing the example again produces the expected error:
 
 #+begin_example
 Duplicate ID: hello-world
