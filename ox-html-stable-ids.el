@@ -1,5 +1,9 @@
 ;;; ox-html-stable-ids.el -- Stable IDs for ox-html.el
 
+;; Author: Jeff Kreeftmeijer <jeff@kreeft.me>
+;; Version: 0.1
+;; URL: https://jeffkreeftmeijer.com/ox-html-stable-ids/
+
 ;;; Commentary:
 
 ;; ox-html-stable-ids.el replaces the default, unstable IDs with
