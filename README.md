@@ -55,7 +55,7 @@ nil."
 
 If the headline has a `:CUSTOM_ID` property, that's immediately returned. If not, the ID is created by taking the headline's contents and converting them to "kebab case".
 
-<div class="aside" id="org096b5a8">
+<div class="aside" id="org34b80a9">
 <p>
 
 </p>
@@ -70,7 +70,7 @@ An implementation in Emacs Lisp uses a regular expression to replace everything 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp" id="org14b366e">(defun org-html-stable-ids--to-kebab-case (string)
+<pre class="src src-emacs-lisp" id="orgd4110fd">(defun org-html-stable-ids--to-kebab-case (string)
   "Convert STRING to kebab-case."
   (string-trim
    (replace-regexp-in-string
@@ -182,28 +182,21 @@ Duplicate ID: hello-world
 
 ## Usage
 
-Install ox-html-stable-ids with straight and use-package:
+Ox-html-stable-ids is currently not available through any of the package registries. Instead, install it from the repository direcly. Install the package with [use-package](<https://github.com/jwiegley/use-package>) and [straight.el](<https://github.com/radian-software/straight.el>), and enable it by calling `org-html-stable-ids-add`:
 
 ```emacs-lisp
-(use-package ox-html-stable-ids
-  :straight '(ox-html-stable-ids
-	      :type git
-	      :host github
-	      :repo "jeffkreeftmeijer/ox-html-stable-ids.el"))
+(use-package ox-md-title
+  :straight
+  (ox-md-title :type git :host github :repo "jeffkreeftmeijer/ox-html-stable-ids.el")
+  :config
+  (org-html-stable-ids-add))
 ```
 
-Call `org-html-stable-ids-add` before publishing a file:
+After calling `org-html-stable-ids-add`, set the `org-html-stable-ids` variable to to enable the package while exporting:
 
 ```emacs-lisp
-(org-html-stable-ids-add)
-(org-publish-file "test/fixtures/hello-world.org"
-		  '("ox-html-stable-ids"
-		    :publishing-function org-html-publish-to-html
-		    :base-directory "."
-		    :publishing-directory "."
-		    :section-numbers nil
-		    :with-toc nil))
-(org-html-stable-ids-remove)
+(let ((org-html-stable-ids t))
+  (org-html-publish-to-html))
 ```
 
 Get stable IDs:
