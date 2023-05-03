@@ -55,7 +55,7 @@ nil."
 
 If the headline has a `:CUSTOM_ID` property, that's immediately returned. If not, the ID is created by taking the headline's contents and converting them to "kebab case".
 
-<div class="aside" id="orgd9261fe">
+<div class="aside" id="org096b5a8">
 <p>
 
 </p>
@@ -70,7 +70,7 @@ An implementation in Emacs Lisp uses a regular expression to replace everything 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp" id="org4b15409">(defun org-html-stable-ids--to-kebab-case (string)
+<pre class="src src-emacs-lisp" id="org14b366e">(defun org-html-stable-ids--to-kebab-case (string)
   "Convert STRING to kebab-case."
   (string-trim
    (replace-regexp-in-string
