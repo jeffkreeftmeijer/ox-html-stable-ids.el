@@ -1,7 +1,7 @@
 :PROPERTIES:
 :ID:       47B63DB4-3322-4422-9595-65BB4A438B04
 :END:
-#+title: ox-html-stable-ids.el: Stable IDs for ox-html.el
+#+title: ox-html-stable-ids: Stable IDs for ox-html.el
 #+author: Jeff Kreeftmeijer
 #+date: 2023-05-03
 #+options: toc:nil
