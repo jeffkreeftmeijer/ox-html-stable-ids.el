@@ -1,5 +1,5 @@
 
-# ox-html-stable-ids.el: Stable IDs for ox-html.el
+# ox-html-stable-ids: Stable IDs for ox-html.el
 
 [Ox-html-stable-ids](https://github.com/jeffkreeftmeijer/ox-html-stable-ids.el) is an Org export extension package that generates HTML with stable ID attributes instead of the random IDs Org's exporter uses by default.
 
@@ -55,7 +55,7 @@ nil."
 
 If the headline has a `:CUSTOM_ID` property, that's immediately returned. If not, the ID is created by taking the headline's contents and converting them to "kebab case".
 
-<div class="aside" id="orge91a5ed">
+<div class="aside" id="org8999d46">
 <p>
 
 </p>
@@ -70,7 +70,7 @@ An implementation in Emacs Lisp uses a regular expression to replace everything 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp" id="orgfe8190f">(defun org-html-stable-ids--to-kebab-case (string)
+<pre class="src src-emacs-lisp" id="org98d1c19">(defun org-html-stable-ids--to-kebab-case (string)
   "Convert STRING to kebab-case."
   (string-trim
    (replace-regexp-in-string
