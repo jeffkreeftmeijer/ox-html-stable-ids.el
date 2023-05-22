@@ -373,5 +373,4 @@ By calling out to =org-export-get-reference= directly, that functionality is los
 
 Adam's example uses URL encoded IDs, instead of stripping all non-alphabetic and non-numeric characters and converting it to kebab-case.
 For non-unique IDs, it prepends the ancestors' IDs and appends numbers until each ID is unique instead of raising an error and forcing the user to use custom IDs.
-It's the better choice if you need stable IDs that sort themselves out and won't break your publishing.
-
+It's the better choice if you need stable IDs that sort themselves out without ever breaking your publishing.
