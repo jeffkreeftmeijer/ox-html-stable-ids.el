@@ -1,0 +1,10 @@
+#!/bin/sh
+for remote in \
+  "https://codeberg.org/jkreeftmeijer/ox-html-stable-ids.el.git" \
+  "https://github.com/jeffkreeftmeijer/ox-html-stable-ids.el.git"
+do
+  git remote set-url --delete --push origin $remote 2> /dev/null
+  git remote set-url --add --push origin $remote
+done
+
+git remote show origin
