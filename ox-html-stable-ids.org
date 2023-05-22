@@ -165,6 +165,15 @@ Finally, the advise is added (and possibly removed) through the ~org-html-stable
     (advice-remove #'org-html--reference #'org-html-stable-ids--reference))
 #+end_src
 
+[fn:adam-porter] This is based on [[https://github.com/alphapapa/unpackaged.el#export-to-html-with-useful-anchors][Adam Porter's useful anchors example]], which differs in a couple of ways:
+
+Adam's example uses URL encoded IDs, instead of stripping all non-alphabetic and non-numeric characters and converting it to kebab-case.
+For non-unique IDs, it prepends the ancestors' IDs and appends numbers until each ID is unique instead of raising an error and forcing the user to use custom IDs.
+It's the better choice if you need stable IDs that sort themselves out without ever breaking your publishing.
+
+[fn:override]: The =org-html--reference= function has added logic to check the /html-prefer-user-labels/ attribute.
+By calling out to =org-export-get-reference= directly, that functionality is lost, meaning this library implies the /html-prefer-user-labels/ setting.
+
 * Results
 
 Now, all headlines in the file get assigned IDs that match their contents:
@@ -366,11 +375,3 @@ Get stable IDs:
 <h2 id="hello-world">Hello, world!</h2>
 #+end_src
 
-[fn:override]: The =org-html--reference= function has added logic to check the /html-prefer-user-labels/ attribute.
-By calling out to =org-export-get-reference= directly, that functionality is lost, meaning this library implies the /html-prefer-user-labels/ setting.
-
-[fn:adam-porter] This is based on [[https://github.com/alphapapa/unpackaged.el#export-to-html-with-useful-anchors][Adam Porter's useful anchors example]], which differs in a couple of ways:
-
-Adam's example uses URL encoded IDs, instead of stripping all non-alphabetic and non-numeric characters and converting it to kebab-case.
-For non-unique IDs, it prepends the ancestors' IDs and appends numbers until each ID is unique instead of raising an error and forcing the user to use custom IDs.
-It's the better choice if you need stable IDs that sort themselves out without ever breaking your publishing.
