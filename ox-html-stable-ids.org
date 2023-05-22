@@ -337,9 +337,9 @@ Instead, install it from the repository direcly.
 Install the package with [[https://github.com/jwiegley/use-package][use-package]] and [[https://github.com/radian-software/straight.el][straight.el]], and enable it by calling ~org-html-stable-ids-add~:
 
 #+begin_src emacs-lisp
-  (use-package ox-md-title
+  (use-package ox-html-stable-ids
     :straight
-    (ox-md-title :type git :host github :repo "jeffkreeftmeijer/ox-html-stable-ids.el")
+    (ox-html-stable-ids :type git :host github :repo "jeffkreeftmeijer/ox-html-stable-ids.el")
     :config
     (org-html-stable-ids-add))
 #+end_src
