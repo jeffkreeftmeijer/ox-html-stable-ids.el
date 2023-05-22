@@ -330,7 +330,7 @@ Duplicate ID: hello-world
   ;;; ox-html-stable-ids.el ends here
 #+end_src
 
-* Usage
+* Installation and usage
 
 Ox-html-stable-ids is currently not available through any of the package registries.
 Instead, install it from the repository direcly.
