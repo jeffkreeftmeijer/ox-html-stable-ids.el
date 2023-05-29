@@ -171,7 +171,7 @@ Adam's example uses URL encoded IDs, instead of stripping all non-alphabetic and
 For non-unique IDs, it prepends the ancestors' IDs and appends numbers until each ID is unique instead of raising an error and forcing the user to use custom IDs.
 It's the better choice if you need stable IDs that sort themselves out without ever breaking your publishing.
 
-[fn:override]: The =org-html--reference= function has added logic to check the /html-prefer-user-labels/ attribute.
+[fn:override] The =org-html--reference= function has added logic to check the /html-prefer-user-labels/ attribute.
 By calling out to =org-export-get-reference= directly, that functionality is lost, meaning this library implies the /html-prefer-user-labels/ setting.
 
 * Results
