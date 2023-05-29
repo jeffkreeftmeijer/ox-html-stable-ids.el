@@ -1,7 +1,7 @@
 
 # ox-html-stable-ids: Stable IDs for ox-html.el
 
-[Ox-html-stable-ids](https://github.com/jeffkreeftmeijer/ox-html-stable-ids.el) is an Org export extension package that generates HTML with stable ID attributes instead of the random IDs Org's exporter uses by default.
+Ox-html-stable-ids is an Org export extension package that generates HTML with stable ID attributes instead of the random IDs Org's exporter uses by default.
 
 
 ## Introduction
@@ -55,7 +55,7 @@ nil."
 
 If the headline has a `:CUSTOM_ID` property, that's immediately returned. If not, the ID is created by taking the headline's contents and converting them to "kebab case".
 
-<div class="aside" id="orge61cde4">
+<div class="aside" id="org2122e6c">
 <p>
 
 </p>
@@ -70,7 +70,7 @@ An implementation in Emacs Lisp uses a regular expression to replace everything 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp" id="org6b2a1ca">(defun org-html-stable-ids--to-kebab-case (string)
+<pre class="src src-emacs-lisp" id="orgf1736a5">(defun org-html-stable-ids--to-kebab-case (string)
   "Convert STRING to kebab-case."
   (string-trim
    (replace-regexp-in-string
@@ -180,7 +180,7 @@ Duplicate ID: hello-world
 ```
 
 
-## Usage
+## Installation and usage
 
 Ox-html-stable-ids is currently not available through any of the package registries. Instead, install it from the repository direcly. Install the package with [use-package](https://github.com/jwiegley/use-package) and [straight.el](https://github.com/radian-software/straight.el), and enable it by calling `org-html-stable-ids-add`:
 
@@ -205,10 +205,24 @@ Get stable IDs:
 <h2 id="hello-world">Hello, world!</h2>
 ```
 
+
+## Contributing
+
+The git repository for ox-html-stable-ids.el is hosted on [Codeberg](https://codeberg.org/jkreeftmeijer/ox-html-stable-ids.el), and mirrored on [GitHub](https://github.com/jeffkreeftmeijer/ox-html-stable-ids.el). Contributions are welcome via either platform.
+
+
+### Tests
+
+Regression tests are written with [ERT](https://www.gnu.org/software/emacs/manual/html_mono/ert.html) and included in `test.el`. To run the tests in batch mode:
+
+```shell
+emacs -batch -l ert -l test.el -f ert-run-tests-batch-and-exit
+```
+
 ## Footnotes
 
 <sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> This is based on [Adam Porter's useful anchors example](https://github.com/alphapapa/unpackaged.el#export-to-html-with-useful-anchors), which differs in a couple of ways:
 
 Adam's example uses URL encoded IDs, instead of stripping all non-alphabetic and non-numeric characters and converting it to kebab-case. For non-unique IDs, it prepends the ancestors' IDs and appends numbers until each ID is unique instead of raising an error and forcing the user to use custom IDs. It's the better choice if you need stable IDs that sort themselves out without ever breaking your publishing.
 
-<sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> : The `org-html--reference` function has added logic to check the *html-prefer-user-labels* attribute. By calling out to `org-export-get-reference` directly, that functionality is lost, meaning this library implies the *html-prefer-user-labels* setting.
+<sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> The `org-html--reference` function has added logic to check the *html-prefer-user-labels* attribute. By calling out to `org-export-get-reference` directly, that functionality is lost, meaning this library implies the *html-prefer-user-labels* setting.
