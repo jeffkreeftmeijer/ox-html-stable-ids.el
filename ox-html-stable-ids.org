@@ -336,6 +336,8 @@ Duplicate ID: hello-world
 
   <<add-remove>>
 
+  (provide 'ox-html-stable-ids)
+
   ;;; ox-html-stable-ids.el ends here
 #+end_src
 
