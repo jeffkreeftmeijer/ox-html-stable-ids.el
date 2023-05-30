@@ -88,4 +88,6 @@ If `NAMED-ONLY` is non-nil, return nil."
   (advice-remove #'org-export-get-reference #'org-html-stable-ids--get-reference)
   (advice-remove #'org-html--reference #'org-html-stable-ids--reference))
 
+(provide 'ox-html-stable-ids)
+
 ;;; ox-html-stable-ids.el ends here
