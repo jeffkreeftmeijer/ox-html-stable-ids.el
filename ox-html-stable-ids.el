@@ -61,13 +61,24 @@ nil."
       (let ((cache (plist-get info :internal-references))
 	    (id (org-html-stable-ids--extract-id datum)))
 	(or (car (rassq datum cache))
-	    (if (assoc id cache)
-		(user-error "Duplicate ID: %s" id)
+	    (progn
+              (while (assoc id cache)
+                (setq id (org-html--update-string-with-underscore id)))
 	      (when id
 		(push (cons id datum) cache)
 		(plist-put info :internal-references cache)
 		id))))
     (funcall orig-fun datum info)))
+
+(defun org-html--update-string-with-underscore (str)
+  "Check if STR ends with an underscore and a number. If it does, increment the
+number; otherwise, append _2."
+  (if (string-match "\\(.*\\)_\\([0-9]+\\)$" str)
+      (let* ((prefix (match-string 1 str))
+             (num (string-to-number (match-string 2 str)))
+             (new-num (1+ num)))
+        (concat prefix "_" (number-to-string new-num)))
+    (concat str "_2")))
 
 (defun org-html-stable-ids--reference (datum info &optional named-only)
   "Call `org-export-get-reference` to get a reference for DATUM with INFO.
