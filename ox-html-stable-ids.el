@@ -54,9 +54,7 @@ nil."
    "-" "-"))
 
 (defun org-html-stable-ids--get-reference (orig-fun datum info)
-  "Return a reference for DATUM with INFO.
-
-    Raise an error if the ID was used in the document before."
+  "Return a reference for DATUM with INFO. "
   (if org-html-stable-ids
       (let ((cache (plist-get info :internal-references))
 	    (id (org-html-stable-ids--extract-id datum)))
