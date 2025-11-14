@@ -35,7 +35,7 @@ Ox-html-stable-ids is disabled by default, even after requiring and enabling the
   :type 'boolean)
 ```
 
-The function that generates headlines in Org's HTML exporer (`org-html-headline`) calls a function called `org-export-get-reference` to generate a unique reference for the headline. Ox-html-stable-ids adds an advice to overrides that function to return stable IDs, based on the headline's contents, instead.<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
+The function that generates headlines in Org's HTML exporer (`org-html-headline`) calls a function called `org-export-get-reference` to generate a unique reference for the headline. Ox-html-stable-ids adds an advice to overrides that function to return stable IDs, based on the headline's contents, instead.<sup><a id="fnr.adam-porter" class="footref" href="#fn.adam-porter" role="doc-backlink">1</a></sup>
 
 First, the `org-html-stable-ids--extract-id` helper function takes a headline and returns a stable ID:
 
@@ -50,12 +50,12 @@ nil."
    (org-element-property :CUSTOM_ID datum)
    (let ((value (org-element-property :raw-value datum)))
      (when value
-       (org-html-stable-ids--to-kebab-case value)))))
+         (org-html-stable-ids--to-kebab-case value)))))
 ```
 
 If the headline has a `:CUSTOM_ID` property, that's immediately returned. If not, the ID is created by taking the headline's contents and converting them to "kebab case".
 
-<div class="aside" id="orgdf5a5e5">
+<div class="aside" id="orgd11d970">
 <p>
 
 </p>
@@ -70,7 +70,7 @@ An implementation in Emacs Lisp uses a regular expression to replace everything 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp" id="orgebfa59e">(defun org-html-stable-ids--to-kebab-case (string)
+<pre class="src src-emacs-lisp" id="orgfc110c5">(defun org-html-stable-ids--to-kebab-case (string)
   "Convert STRING to kebab-case."
   (string-trim
    (replace-regexp-in-string
@@ -90,19 +90,19 @@ The `org-export-get-reference` is overridden by a function named `org-html-stabl
 
     Raise an error if the ID was used in the document before."
   (if org-html-stable-ids
-      (let ((cache (plist-get info :internal-references))
-	    (id (org-html-stable-ids--extract-id datum)))
-	(or (car (rassq datum cache))
-	    (if (assoc id cache)
-		(user-error "Duplicate ID: %s" id)
-	      (when id
-		(push (cons id datum) cache)
-		(plist-put info :internal-references cache)
-		id))))
+        (let ((cache (plist-get info :internal-references))
+              (id (org-html-stable-ids--extract-id datum)))
+          (or (car (rassq datum cache))
+              (if (assoc id cache)
+                  (user-error "Duplicate ID: %s" id)
+                (when id
+                  (push (cons id datum) cache)
+                  (plist-put info :internal-references cache)
+                  id))))
     (funcall orig-fun datum info)))
 ```
 
-Org's HTML exporter doesn't call the `org-export-get-reference` function directly, but has an internal function named `org-html--reference` that's called whenever a reference is needed. To ensure all ids are checked against the internal references list, this package overrides `org-html--reference` to always call `org-export-get-reference` directly:<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>
+Org's HTML exporter doesn't call the `org-export-get-reference` function directly, but has an internal function named `org-html--reference` that's called whenever a reference is needed. To ensure all ids are checked against the internal references list, this package overrides `org-html--reference` to always call `org-export-get-reference` directly:<sup><a id="fnr.override" class="footref" href="#fn.override" role="doc-backlink">2</a></sup>
 
 ```emacs-lisp
 (defun org-html-stable-ids--reference (datum info &optional named-only)
