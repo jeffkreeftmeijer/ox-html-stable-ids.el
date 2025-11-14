@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
       - uses: purcell/setup-emacs@master
         with:
-          version: 28.2
+          version: 30.2
       - run: scripts/readme
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
