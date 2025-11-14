@@ -41,7 +41,10 @@ Return DATUM's `:CUSTOM_ID` if set, or generate a reference from its
 nil."
   (or
    (org-element-property :CUSTOM_ID datum)
-   (let ((value (org-element-property :raw-value datum)))
+   (let ((value (or
+		 (org-element-property :raw-value datum)
+		 (org-element-property :value datum)
+		 )))
      (when value
        (org-html-stable-ids--to-kebab-case value)))))
 
