@@ -64,3 +64,13 @@
    (let ((org-html-stable-ids t))
      (org-html-export-as-html)))
   (org-html-stable-ids-remove))
+
+(ert-deftest internal-link-test ()
+  (org-html-stable-ids-add)
+  (find-file "test/fixtures/internal-link.org")
+  (let ((org-html-stable-ids t))
+    (org-html-export-as-html))
+  (let ((buffer (with-current-buffer "*Org HTML Export*" (buffer-string))))
+    (should (string-match-p "<a id=\"first\"></a>Something" buffer))
+    (should (string-match-p "See item <a href=\"#first\">1</a>" buffer)))
+  (org-html-stable-ids-remove))
