@@ -59,14 +59,14 @@ nil."
     Raise an error if the ID was used in the document before."
   (if org-html-stable-ids
       (let ((cache (plist-get info :internal-references))
-	    (id (org-html-stable-ids--extract-id datum)))
-	(or (car (rassq datum cache))
-	    (if (assoc id cache)
-		(user-error "Duplicate ID: %s" id)
-	      (when id
-		(push (cons id datum) cache)
-		(plist-put info :internal-references cache)
-		id))))
+            (id (org-html-stable-ids--extract-id datum)))
+        (or (car (rassq datum cache))
+            (if (assoc id cache)
+                (user-error "Duplicate ID: %s" id)
+              (when id
+                (push (cons id datum) cache)
+                (plist-put info :internal-references cache)
+                id))))
     (funcall orig-fun datum info)))
 
 (defun org-html-stable-ids--reference (datum info &optional named-only)
