@@ -72,7 +72,7 @@ It only replaces IDs in exported HTML documents when ~org-html-stable-ids~ is no
 The function that generates headlines in Org's HTML exporer (~org-html-headline~) calls a function called ~org-export-get-reference~ to generate a unique reference for the headline.
 Ox-html-stable-ids adds an advice to overrides that function to return stable IDs, based on the headline's contents, instead.[fn:adam-porter]
 
-First, the ~org-html-stable-ids--extract-id~ helper function takes a headline and returns a stable ID:
+First, the ~org-html-stable-ids--extract-id~ helper function takes an element and returns a stable ID:
 
 #+name: extract-id
 #+begin_src emacs-lisp
@@ -95,8 +95,9 @@ First, the ~org-html-stable-ids--extract-id~ helper function takes a headline an
          (org-html-stable-ids--to-kebab-case value)))))
 #+end_src
 
-If the headline has a ~:CUSTOM_ID~ property, that's immediately returned.
-If not, the ID is created by taking the headline's contents and converting them to "kebab case".
+If the element has a ~:CUSTOM_ID~ property, that's immediately returned.
+If not, element's contents are used through the ~org-html-stable-ids--extract-value~ function.
+To create te ID, the value is then converted to "kebab case".
 
 #+begin_aside
 
