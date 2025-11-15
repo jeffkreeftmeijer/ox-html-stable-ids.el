@@ -50,12 +50,12 @@ nil."
    (org-element-property :CUSTOM_ID datum)
    (let ((value (org-element-property :raw-value datum)))
      (when value
-         (org-html-stable-ids--to-kebab-case value)))))
+       (org-html-stable-ids--to-kebab-case value)))))
 ```
 
 If the headline has a `:CUSTOM_ID` property, that's immediately returned. If not, the ID is created by taking the headline's contents and converting them to "kebab case".
 
-<div class="aside" id="orgd11d970">
+<div class="aside" id="orgb17faff">
 <p>
 
 </p>
@@ -70,7 +70,7 @@ An implementation in Emacs Lisp uses a regular expression to replace everything 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp" id="orgfc110c5">(defun org-html-stable-ids--to-kebab-case (string)
+<pre class="src src-emacs-lisp" id="orgd3c8aed">(defun org-html-stable-ids--to-kebab-case (string)
   "Convert STRING to kebab-case."
   (string-trim
    (replace-regexp-in-string
@@ -90,15 +90,15 @@ The `org-export-get-reference` is overridden by a function named `org-html-stabl
 
     Raise an error if the ID was used in the document before."
   (if org-html-stable-ids
-        (let ((cache (plist-get info :internal-references))
-              (id (org-html-stable-ids--extract-id datum)))
-          (or (car (rassq datum cache))
-              (if (assoc id cache)
-                  (user-error "Duplicate ID: %s" id)
-                (when id
-                  (push (cons id datum) cache)
-                  (plist-put info :internal-references cache)
-                  id))))
+      (let ((cache (plist-get info :internal-references))
+            (id (org-html-stable-ids--extract-id datum)))
+        (or (car (rassq datum cache))
+            (if (assoc id cache)
+                (user-error "Duplicate ID: %s" id)
+              (when id
+                (push (cons id datum) cache)
+                (plist-put info :internal-references cache)
+                id))))
     (funcall orig-fun datum info)))
 ```
 
