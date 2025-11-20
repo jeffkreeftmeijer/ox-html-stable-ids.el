@@ -37,9 +37,15 @@ Ox-html-stable-ids is disabled by default, even after requiring and enabling the
 
 The function that generates headlines in Org's HTML exporer (`org-html-headline`) calls a function called `org-export-get-reference` to generate a unique reference for the headline. Ox-html-stable-ids adds an advice to overrides that function to return stable IDs, based on the headline's contents, instead.<sup><a id="fnr.adam-porter" class="footref" href="#fn.adam-porter" role="doc-backlink">1</a></sup>
 
-First, the `org-html-stable-ids--extract-id` helper function takes a headline and returns a stable ID:
+First, the `org-html-stable-ids--extract-id` helper function takes an element and returns a stable ID:
 
 ```emacs-lisp
+(defun org-html-stable-ids--extract-value (datum)
+  (let ((value (or (org-element-property :raw-value datum)
+                   (org-element-property-raw :value datum))))
+    (unless (org-element-deferred-p value)
+      value)))
+
 (defun org-html-stable-ids--extract-id (datum)
   "Extract a reference from a DATUM.
 
@@ -48,14 +54,14 @@ Return DATUM's `:CUSTOM_ID` if set, or generate a reference from its
 nil."
   (or
    (org-element-property :CUSTOM_ID datum)
-   (let ((value (org-element-property :raw-value datum)))
+   (let ((value (org-html-stable-ids--extract-value datum)))
      (when value
        (org-html-stable-ids--to-kebab-case value)))))
 ```
 
-If the headline has a `:CUSTOM_ID` property, that's immediately returned. If not, the ID is created by taking the headline's contents and converting them to "kebab case".
+If the element has a `:CUSTOM_ID` property, that's immediately returned. If not, element's contents are used through the `org-html-stable-ids--extract-value` function. To create te ID, the value is then converted to "kebab case".
 
-<div class="aside" id="orgb17faff">
+<div class="aside" id="org8238144">
 <p>
 
 </p>
@@ -70,7 +76,7 @@ An implementation in Emacs Lisp uses a regular expression to replace everything 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp" id="orgd3c8aed">(defun org-html-stable-ids--to-kebab-case (string)
+<pre class="src src-emacs-lisp" id="org682529d">(defun org-html-stable-ids--to-kebab-case (string)
   "Convert STRING to kebab-case."
   (string-trim
    (replace-regexp-in-string
