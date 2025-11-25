@@ -1,5 +1,6 @@
 :PROPERTIES:
 :ID:       47B63DB4-3322-4422-9595-65BB4A438B04
+:ROAM_TAGS: [[id:D4C028F0-71B4-4FCD-9D17-68802F29A4F0][Org mode]]
 :END:
 #+title: ox-html-stable-ids: Stable IDs for ox-html.el
 #+author: Jeff Kreeftmeijer
