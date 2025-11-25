@@ -61,7 +61,7 @@ nil."
 
 If the element has a `:CUSTOM_ID` property, that's immediately returned. If not, element's contents are used through the `org-html-stable-ids--extract-value` function. To create te ID, the value is then converted to "kebab case".
 
-<div class="aside" id="org8238144">
+<div class="aside" id="orgb8d4cba">
 <p>
 
 </p>
@@ -76,7 +76,7 @@ An implementation in Emacs Lisp uses a regular expression to replace everything 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp" id="org682529d">(defun org-html-stable-ids--to-kebab-case (string)
+<pre class="src src-emacs-lisp" id="orgba552d8">(defun org-html-stable-ids--to-kebab-case (string)
   "Convert STRING to kebab-case."
   (string-trim
    (replace-regexp-in-string
